@@ -52,7 +52,6 @@ class Heat1D(object):
             onde cada linha representa uma posição 'x' e cada coluna
             representa uma instante de tempo 'y'.
         """
-
         u = self.set_u(xn, xf, yn, yf, conds)
         a = self.cal_alpha(xn, xf, yn, yf)
 
