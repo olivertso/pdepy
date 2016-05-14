@@ -55,8 +55,7 @@ class Heat1D(object):
         a = self.cal_alpha(xn, xf, yn, yf)
 
         for j in np.arange(yn):
-            for i in np.arange(1, xn):
-                u[i, j+1] = a*(u[i+1, j] + u[i-1, j]) + (1 - 2*a)*u[i, j]
+            u[1:-1, j+1] = a*(u[:-2, j] + u[2:, j]) + (1 - 2*a)*u[1:-1, j]
 
         return u
 
