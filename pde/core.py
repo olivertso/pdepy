@@ -8,16 +8,59 @@ Classes
 
 __all__ = ['Heat1D']
 
+import abc
 import types
 import numpy as np
 
-class Heat1D(object):
+class Base(metaclass=abc.ABCMeta):
+    """
+    Classe base para Heat1D.
+
+    Métodos abstratos
+    -----------------
+        - set_conditions
+        - check_conds_type
+
+    Métodos concretos
+    -----------------
+        - set_u
+    """
+
+    def set_u(self, xn, xf, yn, yf, conds):
+        """
+        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as
+        condições iniciais e de contornos.
+        """
+        u = np.empty((xn+1, yn+1))
+        x = np.linspace(0, xf, xn+1)
+        y = np.linspace(0, yf, yn+1)
+
+        self.set_conditions(u, x, y, conds)
+
+        return u
+
+    @abc.abstractmethod
+    def set_conditions(self):
+        """
+        Aplica as condições iniciais e de contornos na matriz 'u'.
+        """
+        return
+
+    @abc.abstractmethod
+    def check_conds_type(self):
+        """
+        Verifica os tipos das condições iniciais e de contornos. Se
+        for do tipo function, aplica os valores de 'x' ou 'y'.
+        """
+        return
+
+class Heat1D(Base):
     """
     Equação do calor:
         u_t = u_xx
 
     Métodos:
-        - Método explícito.
+        - Método explícito
     """
 
     def explicit(self, xn, xf, yn, yf, conds):
@@ -60,23 +103,7 @@ class Heat1D(object):
 
         return u
 
-    def set_u(self, xn, xf, yn, yf, conds):
-        """
-        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as
-        condições iniciais e de contornos.
-        """
-        u = np.empty((xn+1, yn+1))
-        x = np.linspace(0, xf, xn+1)
-        y = np.linspace(0, yf, yn+1)
-
-        self.set_conditions(u, x, y, conds)
-
-        return u
-
     def set_conditions(self, u, x, y, conds):
-        """
-        Aplica as condições iniciais e de contornos na matriz 'u'.
-        """
         self.check_conds_type(conds, x, y)
 
         u[:, 0]  = conds[0]
@@ -84,10 +111,6 @@ class Heat1D(object):
         u[-1, :] = conds[2]
 
     def check_conds_type(self, conds, x, y):
-        """
-        Verifica os tipos das condições iniciais e de contornos. Se
-        for do tipo function, aplica os valores de 'x' ou 'y'.
-        """
         if type(conds[0]) == types.FunctionType:
             conds[0] = conds[0](x)
 
