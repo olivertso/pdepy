@@ -2,7 +2,7 @@
 
 ## v0.0.3 (2016-05-14)
 **Adicionados**
-* Novo método `check_conds_type()` que verifica os tipos das condições iniciais e de contornos. Se for do tipo function, aplica os valores de `x` ou `y`.
+* Nova função `check_conds_type()` que verifica os tipos das condições iniciais e de contornos. Se for do tipo function, aplica os valores de `x` ou `y`.
 
 ## v0.0.2 (2016-05-14)
 **Modificados**
