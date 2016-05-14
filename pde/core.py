@@ -8,6 +8,7 @@ Classes
 
 __all__ = ['Heat1D']
 
+import types
 import numpy as np
 
 class Heat1D(object):
@@ -19,7 +20,7 @@ class Heat1D(object):
         - Método explícito.
     """
 
-    def explicit(self, xn, xf, yn, yf, cond):
+    def explicit(self, xn, xf, yn, yf, conds):
         """
         Método explícito.
 
@@ -38,10 +39,11 @@ class Heat1D(object):
             Número de pontos no eixo y menos um.
         yf : float
             Posição final no eixo y.
-        cond : list
-            Lista de funções. 'cond[0]' é as condições iniciais,
-            'cond[1]' e 'cond[2]' são as condições de contornos
-            em x=0 e 'xf', respectivamente.
+        conds : list
+            'conds[0]' é as condições iniciais, 'conds[1]' e 'conds[2]'
+            são as condições de contornos em x=0 e 'xf', respectivamente.
+            Cada elemento de 'conds' pode ser do tipo funciont, scalar ou
+            array_like.
 
         Retornos
         --------
@@ -51,7 +53,7 @@ class Heat1D(object):
             representa uma instante de tempo 'y'.
         """
 
-        u = self.set_u(xn, xf, yn, yf, cond)
+        u = self.set_u(xn, xf, yn, yf, conds)
         a = self.cal_alpha(xn, xf, yn, yf)
 
         for j in np.arange(yn):
@@ -59,7 +61,7 @@ class Heat1D(object):
 
         return u
 
-    def set_u(self, xn, xf, yn, yf, cond):
+    def set_u(self, xn, xf, yn, yf, conds):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as
         condições iniciais e de contornos.
@@ -68,17 +70,33 @@ class Heat1D(object):
         x = np.linspace(0, xf, xn+1)
         y = np.linspace(0, yf, yn+1)
 
-        self.set_conditions(u, x, y, cond)
+        self.set_conditions(u, x, y, conds)
 
         return u
 
-    def set_conditions(self, u, x, y, cond):
+    def set_conditions(self, u, x, y, conds):
         """
         Aplica as condições iniciais e de contornos na matriz 'u'.
         """
-        u[:, 0]  = cond[0](x)
-        u[0, :]  = cond[1](y)
-        u[-1, :] = cond[2](y)
+        self.check_conds_type(conds, x, y)
+
+        u[:, 0]  = conds[0]
+        u[0, :]  = conds[1]
+        u[-1, :] = conds[2]
+
+    def check_conds_type(self, conds, x, y):
+        """
+        Verifica os tipos das condições iniciais e de contornos. Se
+        for do tipo function, aplica os valores de 'x' ou 'y'.
+        """
+        if type(conds[0]) == types.FunctionType:
+            conds[0] = conds[0](x)
+
+        if type(conds[1]) == types.FunctionType:
+            conds[1] = conds[1](y)
+
+        if type(conds[2]) == types.FunctionType:
+            conds[2] = conds[2](y)
 
     def cal_alpha(self, xn, xf, yn, yf):
         """Calcula a constante alpha 'a'."""
@@ -94,8 +112,8 @@ if __name__ == '__main__':
     yf = 3.
 
     f  = lambda x: x**2
-    g1 = lambda y: 0.
-    g2 = lambda y: 9.
+    g1 = np.zeros(yn+1)
+    g2 = 9.
 
     u = Heat1D().explicit(xn, xf, yn, yf, [f, g1, g2])
 
