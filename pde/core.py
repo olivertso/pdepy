@@ -1,20 +1,25 @@
 """
-Métodos de diferenças finitas para equações diferenciais parciais.
+Métodos de diferenças finitas para equações diferenciais parciais de
+segunda ordem.
 
 Classes
 -------
-    - Heat1D: equação do calor.
+    - LinParabolic: equação parabólica linear.
 """
 
-__all__ = ['Heat1D']
+__all__ = ['LinParabolic']
 
 import types
 import numpy as np
 
-class Heat1D(object):
+class LinParabolic(object):
     """
-    Equação do calor:
-        u_t = P(x, y)*u_xx + S(x, y)
+    Equação parabólica linear:
+        u_t = P(x, y)*u_xx + Q(x, y)*u_x + R(x, y)*u + S(x, y),
+
+        u(x, 0)  = conds[0](x), 0 <= x <= xf,
+        u(0, y)  = conds[1](y), 0 <= y <= yf,
+        u(xf, y) = conds[2](y), 0 <= y <= yf.
 
     Métodos:
         - Diferenças finitas centrais explícito
@@ -35,7 +40,7 @@ class Heat1D(object):
         Cada elemento de 'conds' pode ser uma função vetorial de uma
         variável, ou um escalar, ou um vetor de tamanhoxn+1' ou
         'yn+1'.
-    P, S : function, scalar, array_like | optional
+    P, Q, R, S : function, scalar, array_like | optional
         É uma função vetorial de duas variáveis, ou um escalar, ou
         uma matriz de tamanho (xn-1)*yn.
 
@@ -47,23 +52,32 @@ class Heat1D(object):
         representa uma instante de tempo 'y'.
     """
 
-    def exp_central(self, xn, xf, yn, yf, conds, P=1, S=0):
+    def solve(self, xn, xf, yn, yf, conds, P=1, Q=1, R=1, S=0, mthd='ec'):
+        """
+        Método principal. Inicializa os parâmetros e chama o método
+        especificado para resolver a equação.
+        """
+        x, y       = self.set_axis(xn, xf, yn, yf)
+        u          = self.set_u(x, y, conds)
+        𝛂, β, k    = self.cal_constants(xn, xf, yn, yf)
+        P, Q, R, S = self.cal_parameters(P, Q, R, S, x, y)
+
+        if mthd == 'ec':
+            self.exp_central(u, 𝛂, β, k, P, Q, R, S)
+        else:
+            u = 0
+
+        return u
+
+    def exp_central(self, u, 𝛂, β, k, P, Q, R, S):
         """
         Diferenças finitas centrais explícito.
         """
-        x, y = self.set_axis(xn, xf, yn, yf)
-
-        u    = self.set_u(x, y, conds)
-        𝛂, k = self.cal_alpha(xn, xf, yn, yf)
-        P    = self.func_to_val(P, x, y)
-        S    = self.func_to_val(S, x, y)
-
         for j in np.arange(yn):
-            u[1:-1, j+1] = 𝛂 * P[:, j] * (u[:-2, j] + u[2:, j]) + \
-                           (1 - 2 * 𝛂 * P[:, j]) * u[1:-1, j] + \
+            u[1:-1, j+1] = (𝛂 * P[:, j] - β * Q[:, j]) * u[:-2, j] + \
+                           (𝛂 * P[:, j] + β * Q[:, j]) * u[2:, j] + \
+                           (1 + k * R[:, j] - 2 * 𝛂 * P[:, j]) * u[1:-1, j] + \
                            k * S[:, j]
-
-        return u
 
     def set_axis(self, xn, xf, yn, yf):
         """Retorna os vetores dos eixos 'x' e 'y'."""
@@ -82,12 +96,23 @@ class Heat1D(object):
 
         return u
 
-    def cal_alpha(self, xn, xf, yn, yf):
-        """Calcula a constante '𝛂'."""
+    def cal_constants(self, xn, xf, yn, yf):
+        """Calcula as constantes '𝛂', 'β' e 'k'."""
         h = xf / xn
         k = yf / yn
 
-        return k / h**2, k
+        𝛂 = k / h**2
+        β = k / (2 * h)
+
+        return 𝛂, β, k
+
+    def cal_parameters(self, P, Q, R, S, x, y):
+        P = self.func_to_val(P, x, y)
+        Q = self.func_to_val(Q, x, y)
+        R = self.func_to_val(R, x, y)
+        S = self.func_to_val(S, x, y)
+
+        return P, Q, R, S
 
     def set_conditions(self, u, x, y, conds):
         """
@@ -116,7 +141,7 @@ class Heat1D(object):
         """
         if isinstance(func_or_val, types.FunctionType):
             if len(args) == 2:
-                args = np.meshgrid(args[1], args[0])
+                args = np.meshgrid(args[1][1:], args[0][1:-1])
             return func_or_val(*args[::-1])
 
         elif isinstance(func_or_val, (int, float)):
@@ -130,16 +155,19 @@ class Heat1D(object):
             return func_or_val
 
 if __name__ == '__main__':
-    xn = 3
-    xf = 3.
-    yn = 6
-    yf = 3.
+    xn = 4
+    xf = 4.
+    yn = 10
+    yf = 1.
 
-    f  = lambda x: x**2
-    g1 = np.zeros(yn+1)
-    g2 = 9.
+    f  = lambda x: x**2 - 4*x + 5
+    g1 = lambda y: 5 * np.exp(-y)
+    g2 = lambda y: 5 * np.exp(-y)
     conds = [f, g1, g2]
 
-    u = Heat1D().exp_central(xn, xf, yn, yf, conds)
+    Q = lambda x, y: x - 2.
+    R = -3.
+
+    u = LinParabolic().solve(xn, xf, yn, yf, conds, Q=Q, R=R)
 
     print(u)
