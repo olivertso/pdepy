@@ -52,20 +52,20 @@ class Heat1D(object):
         Diferenças finitas centrais explícito.
 
         Propriedade de max-min:
-            a <= 1/2
+            𝛂 <= 1/2
             ou
             k <= (h**2)/2
         """
         x, y = self.set_axis(xn, xf, yn, yf)
 
         u    = self.set_u(x, y, conds)
-        a, k = self.cal_alpha(xn, xf, yn, yf)
+        𝛂, k = self.cal_alpha(xn, xf, yn, yf)
         P    = self.func_to_val(P, x, y)
         S    = self.func_to_val(S, x, y)
 
         for j in np.arange(yn):
-            u[1:-1, j+1] = a * P[:, j] * (u[:-2, j] + u[2:, j]) + \
-                           (1 - 2 * a * P[:, j]) * u[1:-1, j] + \
+            u[1:-1, j+1] = 𝛂 * P[:, j] * (u[:-2, j] + u[2:, j]) + \
+                           (1 - 2 * 𝛂 * P[:, j]) * u[1:-1, j] + \
                            k * S[:, j]
 
         return u
@@ -88,7 +88,7 @@ class Heat1D(object):
         return u
 
     def cal_alpha(self, xn, xf, yn, yf):
-        """Calcula a constante alpha 'a'."""
+        """Calcula a constante '𝛂'."""
         h = xf / xn
         k = yf / yn
 
