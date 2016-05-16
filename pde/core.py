@@ -26,24 +26,21 @@ class LinParabolic(object):
 
     Parâmetros
     ----------
-    xn : int
-        Número de pontos no eixo x menos um.
-    xf : float
-        Posição final no eixo x.
-    yn : int
-        Número de pontos no eixo y menos um.
-    yf : float
-        Posição final no eixo y.
-    conds : list
+    domain : list of int/float
+        [xn, xf, yn, yf], onde 'xn' é inteiro, o número de pontos no
+        eixo 'x' menos 1, 'xf' é escalar, a posição final no eixo x,
+        e analogamente para 'yn' e 'yf'.
+    conds : list of function, scalar, array_like
         'conds[0]' é as condições iniciais, 'conds[1]' e 'conds[2]'
         são as condições de contornos em x=0 e 'xf', respectivamente.
         Cada elemento de 'conds' pode ser uma função vetorial de uma
-        variável, ou um escalar, ou um vetor de tamanhoxn+1' ou
+        variável, ou um escalar, ou um vetor de tamanho 'xn+1' ou
         'yn+1'.
-    P, Q, R, S : function, scalar, array_like | optional
-        É uma função vetorial de duas variáveis, ou um escalar, ou
-        uma matriz de tamanho (xn-1)*yn.
-    mthd : string
+    params : list of function, scalar, array_like
+        Os parâmetros P, Q, R e S. Cada um pode ser uma função vetorial
+        de duas variáveis, ou um escalar, ou uma matriz de tamanho
+        (xn-1)*yn.
+    mthd : string | optional
         Método para resolver a equação. 'ec' para diferenças finitas
         centrais explícito.
 
@@ -55,18 +52,19 @@ class LinParabolic(object):
         representa uma instante de tempo 'y'.
     """
 
-    def solve(self, xn, xf, yn, yf, conds, P=1, Q=1, R=1, S=0, mthd='ec'):
+    def solve(self, domain, params, conds, mthd='ec'):
         """
         Método principal. Inicializa os parâmetros e chama o método
         especificado para resolver a equação.
         """
-        x, y       = self.set_axis(xn, xf, yn, yf)
-        u          = self.set_u(x, y, conds)
-        𝛂, β, k    = self.cal_constants(xn, xf, yn, yf)
-        P, Q, R, S = self.cal_parameters(P, Q, R, S, x, y)
+        x, y    = self.cal_axis(*domain)
+        𝛂, β, k = self.cal_constants(*domain)
+        u       = self.init_u(x, y, conds)
+
+        self.set_parameters(params, x, y)
 
         if mthd == 'ec':
-            self.ec(u, 𝛂, β, k, P, Q, R, S)
+            self.ec(u, 𝛂, β, k, *params)
         else:
             u = 0
 
@@ -76,28 +74,18 @@ class LinParabolic(object):
         """
         Diferenças finitas centrais explícito.
         """
-        for j in np.arange(yn):
+        for j in np.arange(u.shape[1]-1):
             u[1:-1, j+1] = (𝛂 * P[:, j] - β * Q[:, j]) * u[:-2, j] + \
                            (𝛂 * P[:, j] + β * Q[:, j]) * u[2:, j] + \
                            (1 + k * R[:, j] - 2 * 𝛂 * P[:, j]) * u[1:-1, j] + \
                            k * S[:, j]
 
-    def set_axis(self, xn, xf, yn, yf):
+    def cal_axis(self, xn, xf, yn, yf):
         """Retorna os vetores dos eixos 'x' e 'y'."""
         x = np.linspace(0, xf, xn+1)
         y = np.linspace(0, yf, yn+1)
 
         return x, y
-
-    def set_u(self, x, y, conds):
-        """
-        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as
-        condições iniciais e de contornos.
-        """
-        u = np.empty((len(x), len(y)))
-        self.set_conditions(u, x, y, conds)
-
-        return u
 
     def cal_constants(self, xn, xf, yn, yf):
         """Calcula as constantes '𝛂', 'β' e 'k'."""
@@ -109,32 +97,33 @@ class LinParabolic(object):
 
         return 𝛂, β, k
 
-    def cal_parameters(self, P, Q, R, S, x, y):
-        P = self.func_to_val(P, x, y)
-        Q = self.func_to_val(Q, x, y)
-        R = self.func_to_val(R, x, y)
-        S = self.func_to_val(S, x, y)
-
-        return P, Q, R, S
-
-    def set_conditions(self, u, x, y, conds):
+    def init_u(self, x, y, conds):
         """
-        Aplica as condições iniciais e de contornos na matriz 'u'.
+        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as
+        condições iniciais e de contornos.
         """
-        self.check_conds_type(conds, x, y)
+        u = np.empty((len(x), len(y)))
+        self.set_conditions(u, conds, x, y)
 
-        u[:, 0]  = conds[0]
-        u[0, :]  = conds[1]
-        u[-1, :] = conds[2]
+        return u
 
-    def check_conds_type(self, conds, x, y):
+    def set_parameters(self, params, x, y):
         """
-        Verifica os tipos das condições iniciais e de contornos. Se
-        for do tipo function, aplica os valores de 'x' ou 'y'.
+        Verifica o tipo de cada parâmetro, se for do tipo function,
+        aplica as variáveis de 'x' e 'y'.
         """
-        conds[0] = self.func_to_val(conds[0], x)
-        conds[1] = self.func_to_val(conds[1], y)
-        conds[2] = self.func_to_val(conds[2], y)
+        for i in range(len(params)):
+            params[i] = self.func_to_val(params[i], x, y)
+
+    def set_conditions(self, u, conds, x, y):
+        """
+        Verifica o tipo de cada condições iniciais e de contornos,
+        se for do tipo function, aplica os valores de 'x' ou 'y', e
+        atualiza a matriz 'u'.
+        """
+        u[:, 0]  = self.func_to_val(conds[0], x)
+        u[0, :]  = self.func_to_val(conds[1], y)
+        u[-1, :] = self.func_to_val(conds[2], y)
 
     def func_to_val(self, func_or_val, *args):
         """
@@ -145,32 +134,39 @@ class LinParabolic(object):
         if isinstance(func_or_val, types.FunctionType):
             if len(args) == 2:
                 args = np.meshgrid(args[1][1:], args[0][1:-1])
+
             return func_or_val(*args[::-1])
 
-        elif isinstance(func_or_val, (int, float)):
-            if len(args) == 1:
-                return func_or_val
-            elif len(args) == 2:
-                x = np.ones((len(args[0])-2, len(args[1])-1))
-                return func_or_val * x
+        elif isinstance(func_or_val, (int, float)) and len(args) == 2:
+            x = np.ones((len(args[0])-2, len(args[1])-1))
+
+            return func_or_val * x
 
         else:
             return func_or_val
 
-if __name__ == '__main__':
+def _test():
     xn = 4
     xf = 4.
     yn = 10
     yf = 1.
 
-    f  = lambda x: x**2 - 4*x + 5
-    g1 = lambda y: 5 * np.exp(-y)
-    g2 = lambda y: 5 * np.exp(-y)
-    conds = [f, g1, g2]
-
+    P = 1
     Q = lambda x, y: x - 2.
-    R = -3.
+    R = -3
+    S = 0
 
-    u = LinParabolic().solve(xn, xf, yn, yf, conds, Q=Q, R=R)
+    init   = lambda x: x**2 - 4*x + 5
+    bound1 = lambda y: 5 * np.exp(-y)
+    bound2 = lambda y: 5 * np.exp(-y)
+
+    domain = [xn, xf, yn, yf]
+    params = [P, Q, R, S]
+    conds  = [init, bound1, bound2]
+
+    u = LinParabolic().solve(domain, params, conds)
 
     print(u)
+
+if __name__ == '__main__':
+    _test()

@@ -1,5 +1,21 @@
 # Change Log
 
+## [Unreleased]
+**Adicionados**
+* Função `solve()` que prepara os parâmetros para chamar o método especificado conforme a entrada `mthd`.
+* Entrada `mthd` para especificar o método.
+
+**Modificados**
+* Generalização da classe `Heat1d` que resolve a equação do calor `u_t = P(x, y)*u_xx + S(x, y)` para a classe `LinParabolic` que resolve a equação parabólica linear `u_t = P(x, y)*u_xx + Q(x, y)*u_x + R(x, y)*u + S(x, y)`.
+* Entrada `domain` para agrupar as entradas do domínio em uma só.
+* Entrada `params` para agrupar as entradas dos parâmetros em uma só.
+
+**Removidos**
+* Função `check_conds_type()`.
+
+**Fixed**
+* Criar a função `_test()` para testes, pois funções dentro da calsse podem acessar variáveis no `if __name__ == '__main__':` caso não estejam definidas localmente.
+
 ## v0.1.1 (2016-05-15)
 **Fixed**
 * Em `Heat1D().exp_central()`, multiplicar `S` por `k`.
