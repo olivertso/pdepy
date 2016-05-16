@@ -50,11 +50,6 @@ class Heat1D(object):
     def exp_central(self, xn, xf, yn, yf, conds, P=1, S=0):
         """
         Diferenças finitas centrais explícito.
-
-        Propriedade de max-min:
-            𝛂 <= 1/2
-            ou
-            k <= (h**2)/2
         """
         x, y = self.set_axis(xn, xf, yn, yf)
 
