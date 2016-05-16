@@ -43,6 +43,9 @@ class LinParabolic(object):
     P, Q, R, S : function, scalar, array_like | optional
         É uma função vetorial de duas variáveis, ou um escalar, ou
         uma matriz de tamanho (xn-1)*yn.
+    mthd : string
+        Método para resolver a equação. 'ec' para diferenças finitas
+        centrais explícito.
 
     Retornos
     --------
@@ -63,13 +66,13 @@ class LinParabolic(object):
         P, Q, R, S = self.cal_parameters(P, Q, R, S, x, y)
 
         if mthd == 'ec':
-            self.exp_central(u, 𝛂, β, k, P, Q, R, S)
+            self.ec(u, 𝛂, β, k, P, Q, R, S)
         else:
             u = 0
 
         return u
 
-    def exp_central(self, u, 𝛂, β, k, P, Q, R, S):
+    def ec(self, u, 𝛂, β, k, P, Q, R, S):
         """
         Diferenças finitas centrais explícito.
         """
