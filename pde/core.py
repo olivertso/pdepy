@@ -66,7 +66,7 @@ class Heat1D(object):
         for j in np.arange(yn):
             u[1:-1, j+1] = a * P[:, j] * (u[:-2, j] + u[2:, j]) + \
                            (1 - 2 * a * P[:, j]) * u[1:-1, j] + \
-                           S[:, j]
+                           k * S[:, j]
 
         return u
 

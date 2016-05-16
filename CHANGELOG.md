@@ -1,5 +1,9 @@
 # Change Log
 
+## v0.1.1 (2016-05-15)
+**Fixed**
+* Em `Heat1D().exp_central()`, multiplicar `S` por `k`.
+
 ## v0.1.0 (2016-05-15)
 **Adicionados**
 * Generalização da equação do calor, de `u_t = u_xx` para `u_t = P(x, y)*u_xx + S(x, y)`.
