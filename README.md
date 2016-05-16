@@ -1,3 +1,3 @@
 # PDE
 
-Métodos numéricos para equações diferenciais parciais.
+Métodos de diferenças finitas para equações diferenciais parciais.
