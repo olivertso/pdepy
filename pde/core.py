@@ -30,16 +30,16 @@ class LinParabolic(object):
         [xn, xf, yn, yf], onde 'xn' é inteiro, o número de pontos no
         eixo 'x' menos 1, 'xf' é escalar, a posição final no eixo x,
         e analogamente para 'yn' e 'yf'.
+    params : list of function, scalar, array_like
+        Os parâmetros P, Q, R e S. Cada um pode ser uma função vetorial
+        de duas variáveis, ou um escalar, ou uma matriz de tamanho
+        (xn-1)*yn.
     conds : list of function, scalar, array_like
         'conds[0]' é as condições iniciais, 'conds[1]' e 'conds[2]'
         são as condições de contornos em x=0 e 'xf', respectivamente.
         Cada elemento de 'conds' pode ser uma função vetorial de uma
         variável, ou um escalar, ou um vetor de tamanho 'xn+1' ou
         'yn+1'.
-    params : list of function, scalar, array_like
-        Os parâmetros P, Q, R e S. Cada um pode ser uma função vetorial
-        de duas variáveis, ou um escalar, ou uma matriz de tamanho
-        (xn-1)*yn.
     mthd : string | optional
         Método para resolver a equação. 'ec' para diferenças finitas
         centrais explícito.
