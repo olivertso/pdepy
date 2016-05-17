@@ -7,8 +7,7 @@
 
 **Modificados**
 * Generalização da classe `Heat1d` que resolve a equação do calor `u_t = P(x, y)*u_xx + S(x, y)` para a classe `LinParabolic` que resolve a equação parabólica linear `u_t = P(x, y)*u_xx + Q(x, y)*u_x + R(x, y)*u + S(x, y)`.
-* Entrada `domain` para agrupar as entradas do domínio em uma só.
-* Entrada `params` para agrupar as entradas dos parâmetros em uma só.
+* Entradas `domain` e `params` do tipo `tuple` para agrupar as entradas do domínio e dos parâmetros. `tuple` em vez de `list` para garantir que as entradas não sejam modificadas depois da execução do programa.
 
 **Removidos**
 * Função `check_conds_type()`.
