@@ -133,7 +133,7 @@ class LinParabolic(object):
         """
         if isinstance(func_or_val, types.FunctionType):
             if len(args) == 2:
-                args = np.meshgrid(args[1][1:], args[0][1:-1])
+                args = np.meshgrid(args[1][:-1], args[0][1:-1])
 
             return func_or_val(*args[::-1])
 
