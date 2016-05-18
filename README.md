@@ -1,3 +1,3 @@
 # PDE
 
-Métodos de diferenças finitas para equações diferenciais parciais de segunda ordem.
+Métodos de diferenças finitas para resolver problemas de condições iniciais e de contornos para equações diferenciais parciais lineares de segunda ordem.

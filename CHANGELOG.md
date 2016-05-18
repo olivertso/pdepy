@@ -1,12 +1,14 @@
 # Change Log
 
 ## [Unreleased]
+
+## v0.2.0 (2016-05-18)
 **Adicionados**
 * Função `solve()` que prepara os parâmetros para chamar o método especificado conforme a entrada `mthd`.
 * Entrada `mthd` para especificar o método.
 
 **Modificados**
-* Generalização da classe `Heat1d` que resolve a equação do calor `u_t = P(x, y)*u_xx + S(x, y)` para a classe `LinParabolic` que resolve a equação parabólica linear `u_t = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y)`.
+* Generalização da classe `Heat1d` que resolve a equação do calor `u_t = P(x, y)*u_xx + S(x, y)` para a classe `Parabolic` que resolve a equação parabólica linear `u_t = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y)`.
 * Entradas `domain` e `params` do tipo `tuple` para agrupar as entradas do domínio e dos parâmetros. `tuple` em vez de `list` para garantir que as entradas não sejam modificadas depois da execução do programa.
 
 **Removidos**
