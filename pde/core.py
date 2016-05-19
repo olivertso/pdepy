@@ -2,11 +2,12 @@ __all__ = ['Parabolic']
 
 import types
 import numpy as np
+from scipy import linalg
 
 class Parabolic(object):
     """
     Equação parabólica linear em derivadas parciais:
-        u_t = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y).
+        u_y = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y).
 
     Condições iniciais e de contorno:
         u(x, 0)  = init(x),     0 <= x <= xf,
@@ -15,14 +16,16 @@ class Parabolic(object):
     """
 
     def __init__(self):
-        self._methods = ['ec', 'eu']
+        self._methods = ['ec', 'eu', 'ic', 'iu']
 
-    def solve(self, domain, params, conds, mthd='ec'):
+    def solve(self, domain, params, conds, mthd='iu'):
         """
         Métodos
         -------
             * ec: diferenças finitas centrais explícito
             * eu: diferenças finitas upwind explícito
+            * ic: diferenças finitas centrais implícito
+            * iu: diferenças finitas upwind implícito
 
         Parâmetros
         ----------
@@ -56,18 +59,20 @@ class Parabolic(object):
         consts = self._cal_constants(*domain)
         u      = self._set_u(*axis, conds)
 
-        if mthd[1] =='c':
-            𝛉 = 0
-        elif mthd[1] == 'u':
-            𝛉 = 1
+        𝛉 = self._set_𝛉(mthd)
 
         if mthd[0] == 'e':
             self._explicit(u, 𝛉, *consts, *params)
+        elif mthd[0] == 'i':
+            self._implicit(u, 𝛉, *consts, *params)
 
         return u
 
     def _explicit(self, u, 𝛉, 𝛂, β, k, p, q, r, s):
-        """Diferenças finitas centrais(𝛉=0)/upwind(𝛉=1) explícito."""
+        """
+        Métodos de diferenças finitas centrais(𝛉=0) / upwind(𝛉=1)
+        explícitos.
+        """
         for j in np.arange(u.shape[1]-1):
             u[1:-1, j+1] = (𝛂 * p[:, j] + \
                            β * (𝛉 * np.abs(q[:, j]) - q[:, j])) * \
@@ -79,6 +84,33 @@ class Parabolic(object):
                            2 * (𝛂 * p[:, j] + 𝛉 * β * np.abs(q[:, j]))) * \
                            u[1:-1, j] + \
                            k * s[:, j]
+
+    def _implicit(self, u, 𝛉, 𝛂, β, k, p, q, r, s):
+        """
+        Métodos de diferenças finitas centrais(𝛉=0) / upwind(𝛉=1)
+        implícitos.
+        """
+        for j in np.arange(u.shape[1]-1):
+            params = (p[:, j], q[:, j], r[:, j], s[:, j])
+            system = self._set_system(𝛉, 𝛂, β, k, *params, u[:, j:j+2])
+
+            u[1:-1, j+1] = linalg.solve(*system)
+
+    def _set_system(self, 𝛉, 𝛂, β, k, p, q, r, s, u):
+        """
+        Monta a matriz e o vetor do sistema em cada iteração de
+        '_implicit()'.
+        """
+        main  = - 1 + k * r[:] - 2 * (𝛂 * p[:] + 𝛉 * β * np.abs(q[:]))
+        upper = 𝛂 * p[:-1] + β * (𝛉 * np.abs(q[:-1]) + q[:-1])
+        lower = 𝛂 * p[1:]  + β * (𝛉 * np.abs(q[1:])  - q[1:] )
+        mat   = np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
+
+        vec      = - u[1:-1, 0] - k * s[:]
+        vec[0]  -= (𝛂 * p[0]  + β * (𝛉 * np.abs(q[0])  - q[0] )) * u[0, 1]
+        vec[-1] -= (𝛂 * p[-1] + β * (𝛉 * np.abs(q[-1]) + q[-1])) * u[-1, 1]
+
+        return (mat, vec)
 
     def _set_axis(self, xn, xf, yn, yf):
         """Retorna os vetores dos eixos 'x' e 'y'."""
@@ -118,6 +150,13 @@ class Parabolic(object):
         self._set_conditions(u, *conds, x, y)
 
         return u
+
+    def _set_𝛉(self, mthd):
+        """Retorna o valor de '𝛉' conforme 'mthd'."""
+        if mthd[1] =='c':
+            return 0
+        elif mthd[1] == 'u':
+            return 1
 
     def _set_conditions(self, u, init, bound_x0, bound_xf, x, y):
         """
@@ -187,7 +226,7 @@ class Parabolic(object):
 def _test():
     xn = 4
     xf = 4.
-    yn = 10
+    yn = 2
     yf = 1.
 
     p = 1
@@ -202,7 +241,7 @@ def _test():
     domain = (xn, xf, yn, yf)
     params = (p, q, r, s)
     conds  = (init, bound1, bound2)
-    mthd   = 'eu'
+    mthd   = 'iu'
 
     u = Parabolic().solve(domain, params, conds, mthd=mthd)
 
