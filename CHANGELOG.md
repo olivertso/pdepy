@@ -1,8 +1,8 @@
 # Change Log
 
-## [Unreleased]
+## v0.3.0 (2016-05-19)
 **Adicionados**
-* `_set_𝛉()`, determinar o valor de `𝛉`, que difere os métodos explícitos e implícitos.
+* `_set_𝛉()`, determina o valor de `𝛉`, que difere os métodos explícitos e implícitos.
 * `_explicit()`, métodos de diferenças finitas centrais / upwind explícitos.
 * `_implicit()`, métodos de diferenças finitas centrais / upwind implícitos.
 * `__init__()`, cria o atributo `methods`, uma lista com os métodos numéricos implementados.
