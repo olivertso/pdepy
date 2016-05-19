@@ -56,12 +56,12 @@ class Parabolic(object):
         consts = self._cal_constants(*domain)
         u      = self._set_u(*axis, conds)
 
-        if mthd[0] == 'e':
-            if mthd[1] =='c':
-                𝛉 = 0
-            elif mthd[1] == 'u':
-                𝛉 = 1
+        if mthd[1] =='c':
+            𝛉 = 0
+        elif mthd[1] == 'u':
+            𝛉 = 1
 
+        if mthd[0] == 'e':
             self._explicit(u, 𝛉, *consts, *params)
 
         return u
