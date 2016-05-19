@@ -15,13 +15,14 @@ class Parabolic(object):
     """
 
     def __init__(self):
-        self._methods = ['ec']
+        self._methods = ['ec', 'eu']
 
     def solve(self, domain, params, conds, mthd='ec'):
         """
         Métodos
         -------
-            * Diferenças finitas centrais explícito
+            * ec: diferenças finitas centrais explícito
+            * eu: diferenças finitas upwind explícito
 
         Parâmetros
         ----------
@@ -39,8 +40,7 @@ class Parabolic(object):
             para 'init' e yn+1 para 'bound'; ou um escalar; ou um vetor
             de tamanho xn+1 para 'init' e yn+1 para 'bound'.
         mthd : string | optional
-            O método escolhido. 'ec' para diferenças finitas centrais
-            explícito.
+            O método de diferenças finitas escolhido.
 
         Retornos
         --------
@@ -56,17 +56,28 @@ class Parabolic(object):
         consts = self._cal_constants(*domain)
         u      = self._set_u(*axis, conds)
 
-        if mthd == 'ec':
-            self._ec(u, *consts, *params)
+        if mthd[0] == 'e':
+            if mthd[1] =='c':
+                𝛉 = 0
+            elif mthd[1] == 'u':
+                𝛉 = 1
+
+            self._explicit(u, 𝛉, *consts, *params)
 
         return u
 
-    def _ec(self, u, 𝛂, β, k, p, q, r, s):
-        """Diferenças finitas centrais explícito."""
+    def _explicit(self, u, 𝛉, 𝛂, β, k, p, q, r, s):
+        """Diferenças finitas centrais(𝛉=0)/upwind(𝛉=1) explícito."""
         for j in np.arange(u.shape[1]-1):
-            u[1:-1, j+1] = (𝛂 * p[:, j] - β * q[:, j]) * u[:-2, j] + \
-                           (𝛂 * p[:, j] + β * q[:, j]) * u[2:, j] + \
-                           (1 + k * r[:, j] - 2 * 𝛂 * p[:, j]) * u[1:-1, j] + \
+            u[1:-1, j+1] = (𝛂 * p[:, j] + \
+                           β * (𝛉 * np.abs(q[:, j]) - q[:, j])) * \
+                           u[:-2, j] + \
+                           (𝛂 * p[:, j] + \
+                           β * (𝛉 * np.abs(q[:, j]) + q[:, j])) * \
+                           u[2:, j] + \
+                           (1 + k * r[:, j] - \
+                           2 * (𝛂 * p[:, j] + 𝛉 * β * np.abs(q[:, j]))) * \
+                           u[1:-1, j] + \
                            k * s[:, j]
 
     def _set_axis(self, xn, xf, yn, yf):
@@ -191,7 +202,7 @@ def _test():
     domain = (xn, xf, yn, yf)
     params = (p, q, r, s)
     conds  = (init, bound1, bound2)
-    mthd   = 'ec'
+    mthd   = 'eu'
 
     u = Parabolic().solve(domain, params, conds, mthd=mthd)
 

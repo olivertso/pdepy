@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 **Adicionados**
+* Método upwind explícito. O método upwind é generalizado com o método central em uma função `_explicit()`, diferenciados por uma constante `𝛉`.
 * `__init__()`, cria o atributo `methods`, uma lista com os métodos numéricos implementados.
 * `_check_arguments()`, `_check_tuple()`, `_check_len()` e `_check_mthd()` para verificações dos argumentos de `solve()`.
 
