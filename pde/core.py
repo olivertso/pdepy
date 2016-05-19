@@ -5,14 +5,17 @@ import numpy as np
 
 class Parabolic(object):
     """
-    Equação parabólica linear:
+    Equação parabólica linear em derivadas parciais:
         u_t = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y).
 
-    Condições iniciais e de contornos:
+    Condições iniciais e de contorno:
         u(x, 0)  = init(x),     0 <= x <= xf,
         u(0, y)  = bound_x0(y), 0 <= y <= yf,
         u(xf, y) = bound_xf(y), 0 <= y <= yf.
     """
+
+    def __init__(self):
+        self._methods = ['ec']
 
     def solve(self, domain, params, conds, mthd='ec'):
         """
@@ -45,6 +48,8 @@ class Parabolic(object):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
+        self._check_arguments(domain, params, conds, mthd)
+
         axis   = self._set_axis(*domain)
         params = self._set_parameters(params, *axis)
         consts = self._cal_constants(*domain)
@@ -52,8 +57,6 @@ class Parabolic(object):
 
         if mthd == 'ec':
             self._ec(u, *consts, *params)
-        else:
-            u = 0
 
         return u
 
@@ -97,7 +100,7 @@ class Parabolic(object):
     def _set_u(self, x, y, conds):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
-        iniciais e de contornos.
+        iniciais e de contorno.
         """
         u = np.empty((len(x), len(y)))
         self._set_conditions(u, *conds, x, y)
@@ -106,7 +109,7 @@ class Parabolic(object):
 
     def _set_conditions(self, u, init, bound_x0, bound_xf, x, y):
         """
-        Atualiza a matriz 'u' com as condições iniciais e de contornos.
+        Atualiza a matriz 'u' com as condições iniciais e de contorno.
         """
         u[:, 0]  = self._func_to_val(init, x)
         u[0, :]  = self._func_to_val(bound_x0, y)
@@ -137,6 +140,35 @@ class Parabolic(object):
             # condições, 'func_or_val' não é modificada.
             return func_or_val
 
+    def _check_arguments(self, domain, params, conds, mthd):
+        """Função principal para as verificações."""
+        self._check_tuple(domain, 'domain')
+        self._check_tuple(params, 'params')
+        self._check_tuple(conds, 'conds')
+
+        self._check_len(domain, 'domain', 4)
+        self._check_len(params, 'params', 4)
+        self._check_len(conds, 'conds', 3)
+
+        self._check_mthd(mthd)
+
+    def _check_tuple(self, arg, arg_name):
+        """Verifica se 'arg' é do tipo tupla."""
+        if not isinstance(arg, tuple):
+            raise TypeError('\'' + arg_name + '\' should be a tuple.')
+
+    def _check_len(self, arg, arg_name, exp_len):
+        """Verifica se 'arg' tem tamanho 'exp_len'."""
+        if len(arg) != exp_len:
+            raise ValueError('\'' + arg_name + '\' should have ' + \
+                             str(exp_len) + ' elements, ' + \
+                             str(len(arg)) + ' given.')
+
+    def _check_mthd(self, mthd):
+        """Verifica se o método numérico 'mthd' é válido."""
+        if mthd not in self._methods:
+            raise ValueError('Method \'' + mthd + '\' is not valid.')
+
 def _test():
     xn = 4
     xf = 4.
@@ -155,8 +187,9 @@ def _test():
     domain = (xn, xf, yn, yf)
     params = (p, q, r, s)
     conds  = (init, bound1, bound2)
+    mthd   = 'ec'
 
-    u = Parabolic().solve(domain, params, conds)
+    u = Parabolic().solve(domain, params, conds, mthd=mthd)
 
     print(u)
 

@@ -1,3 +1,3 @@
 # PDE
 
-Métodos de diferenças finitas para resolver problemas de condições iniciais e de contornos para equações diferenciais parciais lineares de segunda ordem.
+Métodos de diferenças finitas para resolver o problema de condições iniciais e de contorno da equação parabólica linear em derivadas parciais.

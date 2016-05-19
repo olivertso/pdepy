@@ -1,6 +1,9 @@
 # Change Log
 
 ## [Unreleased]
+**Adicionados**
+* `__init__()`, cria o atributo `methods`, uma lista com os métodos numéricos implementados.
+* `_check_arguments()`, `_check_tuple()`, `_check_len()` e `_check_mthd()` para verificações dos argumentos de `solve()`.
 
 ## v0.2.0 (2016-05-18)
 **Adicionados**
