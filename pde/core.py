@@ -25,18 +25,19 @@ class Parabolic(object):
 
         Parâmetros
         ----------
-        domain : tuple of int/float
-            (xn, xf, yn, yf), onde 'xn' é inteiro, o número de pontos no
-            eixo 'x' da malha interior, 'xf' é escalar, a posição final
-            final no eixo x, e analogamente para 'yn' e 'yf'.
-        params : tuple of function, scalar, array_like
-            (p, q, r, s), onde cada elemento pode ser uma função de duas
-            variáveis (vetor/matriz), ou um escalar, ou uma matriz de
-            tamanho (xn-1)*yn.
-        conds : tuple of function, scalar, array_like
-            (init, bound_x0, bound_xf), onde cada elemento pode ser uma
-            função de uma variável, ou um escalar, ou um vetor de tamanho
-            'xn+1' para 'init' e 'yn+1' para 'bound'.
+        domain : tuple, (int, float, int, float)
+            Tupla da forma (xn, xf, yn, yf), onde 'xn' e 'yn' são os
+            números de partições nos eixos 'x' e 'y'; 'xf' e 'yf' são as
+            posições finais nos eixos 'x' e 'y'.
+        params : tuple of function, scalar or array_like
+            Tupla da forma (p, q, r, s), onde cada elemento pode ser uma
+            função f(x, y) sendo 'x' e 'y' matrizes de tamanho (xn-1)*yn;
+            ou um escalar; ou uma matriz de tamanho (xn-1)*yn.
+        conds : tuple of function, scalar or array_like
+            Tupla da forma (init, bound_x0, bound_xf), onde cada elemento
+            pode ser uma função f(x) sendo 'x' um vetor de tamanho xn+1
+            para 'init' e yn+1 para 'bound'; ou um escalar; ou um vetor
+            de tamanho xn+1 para 'init' e yn+1 para 'bound'.
         mthd : string | optional
             O método escolhido. 'ec' para diferenças finitas centrais
             explícito.
@@ -116,12 +117,13 @@ class Parabolic(object):
         u[-1, :] = self._func_to_val(bound_xf, y)
 
     def _func_to_val(self, func_or_val, *axis):
-        """Retorna os 'params' ou 'conds' no formato certo."""
+        """
+        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
+        """
         if isinstance(func_or_val, types.FunctionType):
             if len(axis) == 2:
-                # Caso dos parâmetros 'p', 'q', 'r' e 's'. Vetores 'x' e
-                # 'y' são transformados em matrizes do tamanho da malha
-                # interior.
+                # Caso dos parâmetros. Vetores 'x' e 'y' são transformados
+                # em matrizes do tamanho da malha interior.
                 axis = np.meshgrid(axis[1][:-1], axis[0][1:-1])[::-1]
 
             # Se len(axis)=1 então é caso das condições, os vetores 'x' e
@@ -130,7 +132,8 @@ class Parabolic(object):
             return func_or_val(*axis)
 
         elif isinstance(func_or_val, (int, float)) and len(axis) == 2:
-            # Caso dos parâmetros 'p', 'q', 'r' e 's'.
+            # Caso dos parâmetros. Uma matriz do tamanho da malha interior
+            # é criada.
             x = np.ones((len(axis[0])-2, len(axis[1])-1))
 
             return func_or_val * x
@@ -143,11 +146,12 @@ class Parabolic(object):
     def _check_arguments(self, domain, params, conds, mthd):
         """Função principal para as verificações."""
         self._check_tuple(domain, 'domain')
-        self._check_tuple(params, 'params')
-        self._check_tuple(conds, 'conds')
-
         self._check_len(domain, 'domain', 4)
+
+        self._check_tuple(params, 'params')
         self._check_len(params, 'params', 4)
+
+        self._check_tuple(conds, 'conds')
         self._check_len(conds, 'conds', 3)
 
         self._check_mthd(mthd)
