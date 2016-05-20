@@ -218,6 +218,23 @@ class Parabolic(object):
         if mthd not in self._methods:
             raise ValueError('Method \'' + mthd + '\' is not valid.')
 
+class Wave(object):
+    """
+    Equação da onda:
+        u_yy = u_xx.
+
+    Condições iniciais e de contorno:
+        u(x, 0)   = init(x),     0 <= x <= xf,
+        u_y(x, 0) = d_init(x),   0 <= x <= xf,
+        u(0, y)   = bound_x0(y), 0 <= y <= yf,
+        u(xf, y)  = bound_xf(y), 0 <= y <= yf.
+    """
+
+    def __init__(self):
+        self._methods = ['e']
+
+    def solve(self, domain, params, conds, mthd='e'):
+
 def _test():
     xn = 4
     xf = 4.
