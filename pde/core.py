@@ -57,7 +57,7 @@ class Parabolic(object):
         axis   = self._set_axis(*domain)
         params = self._set_parameters(params, *axis)
         consts = self._cal_constants(*domain)
-        u      = self._set_u(*axis, conds)
+        u      = self._set_u(*axis, *conds)
 
         𝛉 = self._set_𝛉(mthd)
 
@@ -141,13 +141,16 @@ class Parabolic(object):
 
         return (𝛂, β, k)
 
-    def _set_u(self, x, y, conds):
+    def _set_u(self, x, y, init, bound_x0, bound_xf):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
         iniciais e de contorno.
         """
         u = np.empty((len(x), len(y)))
-        self._set_conditions(u, *conds, x, y)
+
+        u[:, 0]  = self._func_to_val(init, x)
+        u[0, :]  = self._func_to_val(bound_x0, y)
+        u[-1, :] = self._func_to_val(bound_xf, y)
 
         return u
 
@@ -157,14 +160,6 @@ class Parabolic(object):
             return 0
         elif mthd[1] == 'u':
             return 1
-
-    def _set_conditions(self, u, init, bound_x0, bound_xf, x, y):
-        """
-        Atualiza a matriz 'u' com as condições iniciais e de contorno.
-        """
-        u[:, 0]  = self._func_to_val(init, x)
-        u[0, :]  = self._func_to_val(bound_x0, y)
-        u[-1, :] = self._func_to_val(bound_xf, y)
 
     def _func_to_val(self, func_or_val, *axis):
         """
