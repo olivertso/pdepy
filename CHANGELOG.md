@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased]
+**Adicionados**
+* Nova classe `Base`.
+* Nova classe `Wave` para resolver o problema de condições iniciais e de contorno da equação da onda `u_yy = u_xx` utilizando um método explícito e um implícito.
+
+**Modificados**
+* Separação da função `_set_system()` em `_set_mat()` e `_set_vec()`.
+
 ## v0.3.0 (2016-05-19)
 **Adicionados**
 * `_set_𝛉()`, determina o valor de `𝛉`, que difere os métodos explícitos e implícitos.
