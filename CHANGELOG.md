@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+
+## v0.4.0 (2016-05-21)
 **Adicionados**
 * Nova classe `Base`.
 * Nova classe `Wave` para resolver o problema de condições iniciais e de contorno da equação da onda `u_yy = u_xx` utilizando um método explícito e um implícito.
