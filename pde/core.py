@@ -1,7 +1,6 @@
-__all__ = ['Parabolic', 'Wave']
+__all__ = ['Laplace', 'Parabolic', 'Wave']
 
-import abc
-import types
+import abc, sys, types
 import numpy as np
 from scipy import linalg
 
@@ -17,15 +16,12 @@ class Base(abc.ABC):
         * _set_vec
         * _set_u
         * _cal_constants
-        * _func_to_val
-        * _check_arguments
+        * _mesh_int_grid
 
     Funções concretas
     -----------------
         * _set_axis
-        * _check_tuple
-        * _check_len
-        * _check_domain
+        * _set_parameters
         * _check_mthd
     """
 
@@ -57,27 +53,22 @@ class Base(abc.ABC):
     def _set_u(self):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
-        iniciais e de contorno.
+        oferecidas.
         """
         return
 
     @abc.abstractmethod
     def _cal_constants(self):
         """
-        Calcula as constantes necessárias entre.
+        Calcula as constantes necessárias.
         """
         return
 
     @abc.abstractmethod
-    def _func_to_val(self, func_or_val, *axis):
+    def _mesh_int_grid(self):
         """
-        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
+        Retorna matrizes 'x' e 'y' conforme o tamanho da malha interior.
         """
-        return
-
-    @abc.abstractmethod
-    def _check_arguments(self):
-        """Função principal para as verificações."""
         return
 
     def _set_axis(self, xn, xf, yn, yf):
@@ -87,27 +78,31 @@ class Base(abc.ABC):
 
         return (x, y)
 
-    def _check_tuple(self, arg, arg_name):
-        """Verifica se 'arg' é do tipo tupla."""
-        if not isinstance(arg, tuple):
-            raise TypeError('\'' + arg_name + '\' should be a tuple.')
+    def _set_parameters(self, params, x, y):
+        """
+        Atualiza os parâmetros para matrizes de tamanho da malha interior
+        de 'u'.
+        """
+        _params = list(params)
 
-    def _check_len(self, arg, arg_name, exp_len):
-        """Verifica se 'arg' tem tamanho 'exp_len'."""
-        if len(arg) != exp_len:
-            raise ValueError('\'' + arg_name + '\' should have ' + \
-                             str(exp_len) + ' elements, ' + \
-                             str(len(arg)) + ' given.')
+        for i in np.arange(len(_params)):
+            if isinstance(_params[i], types.FunctionType):
+                y_m, x_m = self._mesh_int_grid(y, x)
+                _params[i] = _params[i](x_m, y_m)
 
-    def _check_domain(self, domain):
-        """Verifica argumento 'domain'."""
-        self._check_tuple(domain, 'domain')
-        self._check_len(domain, 'domain', 4)
+            elif isinstance(_params[i], (int, float)):
+                _params[i] *= np.ones((len(x)-2, len(y)-1))
+
+            print(_params[i])
+            print()
+
+        return _params
 
     def _check_mthd(self, mthd):
         """Verifica se o método numérico 'mthd' é válido."""
         if mthd not in self._methods:
-            raise ValueError('Method \'' + mthd + '\' is not valid.')
+            sys.exit('Value \'' + mthd + '\' for argument \'mthd\' is '
+                     'not valid.')
 
 class TimeDependent(Base):
     """
@@ -121,7 +116,7 @@ class TimeDependent(Base):
     Funções concretas
     -----------------
         * _set_u
-        * _func_to_val
+        * _mesh_int_grid
     """
 
     @abc.abstractmethod
@@ -129,45 +124,24 @@ class TimeDependent(Base):
         """Métodos de diferenças finitas explícitos."""
         return
 
-    def _set_u(self, x, y, init, bound_x0, bound_xf):
+    def _set_u(self, xn, yn, init, bound_x0, bound_xf):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
         iniciais e de contorno.
         """
-        u = np.empty((len(x), len(y)))
+        u = np.empty((xn+1, yn+1))
 
-        u[:, 0]  = self._func_to_val(init, x)
-        u[0, :]  = self._func_to_val(bound_x0, y)
-        u[-1, :] = self._func_to_val(bound_xf, y)
+        u[:, 0]  = init
+        u[0, :]  = bound_x0
+        u[-1, :] = bound_xf
 
         return u
 
-    def _func_to_val(self, func_or_val, *axis):
+    def _mesh_int_grid(self, y, x):
         """
-        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
+        Retorna matrizes 'x' e 'y' de tamanho (xn-2)*(yn-1).
         """
-        if isinstance(func_or_val, types.FunctionType):
-            if len(axis) == 2:
-                # Caso dos parâmetros. Vetores 'x' e 'y' são transformados
-                # em matrizes do tamanho da malha interior.
-                axis = np.meshgrid(axis[1][:-1], axis[0][1:-1])[::-1]
-
-            # Se len(axis)=1 então é caso das condições, os vetores 'x' e
-            # 'y' não são modificados.
-
-            return func_or_val(*axis)
-
-        elif isinstance(func_or_val, (int, float)) and len(axis) == 2:
-            # Caso dos parâmetros. Uma matriz do tamanho da malha interior
-            # é criada.
-            x = np.ones((len(axis[0])-2, len(axis[1])-1))
-
-            return func_or_val * x
-
-        else:
-            # Se 'func_or_val' é escalar e len(axis)=1, é caso das
-            # condições, 'func_or_val' não é modificada.
-            return func_or_val
+        return np.meshgrid(y[:-1], x[1:-1])
 
 class SteadyState(Base):
     """
@@ -177,26 +151,28 @@ class SteadyState(Base):
     Funções concretas
     -----------------
         * _set_u
-        * _func_to_val
+        * _mesh_int_grid
     """
 
-    def _set_u(self, x, y, init, bound):
+    def _set_u(self, xn, yn, bound_x0, bound_xf, bound_y0, bound_yf):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
         de contorno.
         """
-        u = np.empty((len(x), len(y)))
+        u = np.empty((xn+1, yn+1))
 
-        # TODO
+        u[0, :]  = bound_x0
+        u[-1, :] = bound_xf
+        u[:, 0]  = bound_y0
+        u[:, -1] = bound_yf
 
         return u
 
-    def _func_to_val(self, func_or_val, *axis):
+    def _mesh_int_grid(self, y, x):
         """
-        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
+        Retorna matrizes 'x' e 'y' de tamanho (xn-2)*(yn-2).
         """
-
-        # TODO
+        return np.meshgrid(y[1:-1], x[1:-1])
 
 class Laplace(SteadyState):
     """
@@ -208,7 +184,7 @@ class Laplace(SteadyState):
     """
 
     def __init__(self):
-        self.method = ['c', 'u']
+        self._methods = ['c', 'u']
 
     def solve(self, domain, conds, mthd='c'):
         """
@@ -223,12 +199,10 @@ class Laplace(SteadyState):
             Tupla da forma (xn, xf, yn, yf), onde 'xn' e 'yn' são os
             números de partições nos eixos 'x' e 'y'; 'xf' e 'yf' são as
             posições finais nos eixos 'x' e 'y'.
-        conds : function, scalar or tuple of array_like
-            Condições de contorno. Pode ser uma função f(x, y) sendo 'x'
-            um vetor de tamanho xn+1 e 'y' um escalar ou 'y' um vetor de
-            tamanho yn+1 e 'x' um escalar; ou um escalar; ou uma tupla da
-            forma (cond_x0, cond_xf, cond_y0, cond_yf) onde cada elemento
-            é um vetor de tamanho xn+1 para 'cond_x' e yn+1 para 'cond_y'.
+        conds : tuple of scalar or array_like
+            Tupla da forma (bound_x0, bound_xf, bound_y0, bound_yf), onde
+            cada elemento pode ser um escalar, ou um vetor de tamanho xn+1
+            para 'cond_x' e yn+1 para 'cond_y'.
         mthd : string | optional
             O método de diferenças finitas escolhido.
 
@@ -239,35 +213,47 @@ class Laplace(SteadyState):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        axis   = self._set_axis(*domain)
-        consts = self._cal_constants(*domain)
-        u      = self._set_u(*axis, *conds)
+        self._check_mthd(mthd)
 
-        self._implicit(u, *consts)
+        consts = self._cal_constants(*domain)
+        u      = self._set_u(*domain[::2], *conds)
+
+        self._implicit(u, *domain[::2], *consts)
 
         return u
 
-    def _implicit(self, u, 𝛂, β):
+    def _implicit(self, u, xn, yn, 𝛂, β):
         """Métodos de diferenças finitas implícitos."""
-        mat = self._set_mat(𝛂, β)
+        mat = self._set_mat(𝛂, β, xn, yn)
         vec = self._set_vec(𝛂, β, u)
 
         x = linalg.solve(mat, vec)
 
-        # TODO: u = np.reshape()
+        u[1:-1, 1:-1] = np.reshape(x, (xn-1, yn-1), 'F')
 
-    def _set_mat(self, 𝛂, β):
-        """
-        Monta a matriz do sistema em cada iteração de '_implicit()'.
-        """
-        return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
+    def _set_mat(self, 𝛂, β, xn, yn):
+        """Monta a matriz do sistema em '_implicit()'."""
+        n = (xn-1) * (yn-1)
+
+        main = np.full(n, - 2 * (𝛂 + β))
+        sub1 = np.full(n-1, β)
+        sub2 = np.full(n-xn+1, 𝛂)
+
+        sub1[xn-2:-1:xn-1] = 0
+
+        return np.diag(main) + np.diag(sub1, 1) + np.diag(sub1, -1) + \
+               np.diag(sub2, xn-1) + np.diag(sub2, -xn+1)
 
     def _set_vec(self, 𝛂, β, u):
-        """
-        Monta o vetor do sistema em cada iteração de '_implicit()'.
-        """
+        """Monta o vetor do sistema em '_implicit()'."""
+        vec = np.zeros_like((u[1:-1, 1:-1]))
 
-        return vec
+        vec[0, :]  -= β * u[0, 1:-1]
+        vec[-1, :] -= β * u[-1, 1:-1]
+        vec[:, 0]  -= 𝛂 * u[1:-1, 0]
+        vec[:, -1] -= 𝛂 * u[1:-1, -1]
+
+        return np.reshape(vec, np.size(vec), 'F')
 
     def _cal_constants(self, xn, xf, yn, yf):
         """Calcula as constantes '𝛂' e 'β'."""
@@ -285,6 +271,10 @@ class Parabolic(TimeDependent):
         u(x, 0)  = init(x),     0 <= x <= xf,
         u(0, y)  = bound_x0(y), 0 <= y <= yf,
         u(xf, y) = bound_xf(y), 0 <= y <= yf.
+
+    Funções próprias
+    ----------------
+        * _set_𝛉
     """
 
     def __init__(self):
@@ -309,11 +299,10 @@ class Parabolic(TimeDependent):
             Tupla da forma (p, q, r, s), onde cada elemento pode ser uma
             função f(x, y) sendo 'x' e 'y' matrizes de tamanho (xn-1)*yn;
             ou um escalar; ou uma matriz de tamanho (xn-1)*yn.
-        conds : tuple of function, scalar or array_like
+        conds : tuple of scalar or array_like
             Tupla da forma (init, bound_x0, bound_xf), onde cada elemento
-            pode ser uma função f(x) sendo 'x' um vetor de tamanho xn+1
-            para 'init' e yn+1 para 'bound'; ou um escalar; ou um vetor
-            de tamanho xn+1 para 'init' e yn+1 para 'bound'.
+            pode ser uma um escalar; ou um vetor de tamanho xn+1 para
+            'init' e yn+1 para 'bound'.
         mthd : string | optional
             O método de diferenças finitas escolhido.
 
@@ -324,12 +313,12 @@ class Parabolic(TimeDependent):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        self._check_arguments(domain, params, conds, mthd)
+        self._check_mthd(mthd)
 
         axis   = self._set_axis(*domain)
         params = self._set_parameters(params, *axis)
         consts = self._cal_constants(*domain)
-        u      = self._set_u(*axis, *conds)
+        u      = self._set_u(*domain[::2], *conds)
 
         𝛉 = self._set_𝛉(mthd)
 
@@ -385,18 +374,6 @@ class Parabolic(TimeDependent):
 
         return vec
 
-    def _set_parameters(self, params, x, y):
-        """
-        Atualiza os parâmetros para matrizes de tamanho da malha interior
-        de 'u'.
-        """
-        _params = []
-
-        for param in params:
-            _params.append(self._func_to_val(param, x, y))
-
-        return _params
-
     def _cal_constants(self, xn, xf, yn, yf):
         """Calcula as constantes '𝛂', 'β' e 'k'."""
         h = xf / xn
@@ -414,18 +391,6 @@ class Parabolic(TimeDependent):
         elif mthd[1] == 'u':
             return 1
 
-    def _check_arguments(self, domain, params, conds, mthd):
-        """Função principal para as verificações."""
-        self._check_domain(domain)
-
-        self._check_tuple(params, 'params')
-        self._check_len(params, 'params', 4)
-
-        self._check_tuple(conds, 'conds')
-        self._check_len(conds, 'conds', 3)
-
-        self._check_mthd(mthd)
-
 class Wave(TimeDependent):
     """
     Equação da onda:
@@ -436,6 +401,10 @@ class Wave(TimeDependent):
         u_y(x, 0) = d_init(x),   0 <= x <= xf,
         u(0, y)   = bound_x0(y), 0 <= y <= yf,
         u(xf, y)  = bound_xf(y), 0 <= y <= yf.
+
+    Funções próprias
+    ----------------
+        * _set_first_row
     """
 
     def __init__(self):
@@ -454,12 +423,10 @@ class Wave(TimeDependent):
             Tupla da forma (xn, xf, yn, yf), onde 'xn' e 'yn' são os
             números de partições nos eixos 'x' e 'y'; 'xf' e 'yf' são as
             posições finais nos eixos 'x' e 'y'.
-        conds : tuple of function, scalar or array_like
+        conds : tuple of scalar or array_like
             Tupla da forma (d_init, init, bound_x0, bound_xf), onde cada
-            elemento pode ser uma função f(x) sendo 'x' um vetor de
-            tamanho xn+1 para 'd_init' e 'init', e yn+1 para 'bound'; ou
-            um escalar; ou um vetor de tamanho xn+1 para 'init' e yn+1
-            para 'bound'.
+            elemento pode ser um escalar; ou um vetor de tamanho xn+1 para
+            'init' e yn+1 para 'bound'.
         mthd : string | optional
             O método de diferenças finitas escolhido.
 
@@ -470,14 +437,12 @@ class Wave(TimeDependent):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        self._check_arguments(domain, conds, mthd)
+        self._check_mthd(mthd)
 
-        axis   = self._set_axis(*domain)
         consts = self._cal_constants(*domain)
-        d_init = self._func_to_val(conds[0], axis[0])
-        u      = self._set_u(*axis, *conds[1:])
+        u      = self._set_u(*domain[::2], *conds[1:])
 
-        self._set_first_row(u, *consts[1:], d_init)
+        self._set_first_row(u, *consts[1:], conds[0])
 
         if mthd == 'e':
             self._explicit(u, consts[0]**(-1))
@@ -523,14 +488,6 @@ class Wave(TimeDependent):
 
         return vec
 
-    def _set_first_row(self, u, h, k, d_init):
-        """
-        Determina a primeira linha da malha interior. 'd_init' pode ser um
-        escalar ou um vetor de tamanho do 'x'.
-        """
-        u[1:-1, 1] = (u[:, 0] + k * d_init)[1:-1] + k**2 / 2 * \
-                     (u[2:, 0] - 2 * u[1:-1, 0] + u[:-2, 0]) / (h**2)
-
     def _cal_constants(self, xn, xf, yn, yf):
         """Calcula as constantes '𝛂', 'h' e 'k'."""
         h = xf / xn
@@ -540,29 +497,54 @@ class Wave(TimeDependent):
 
         return (𝛂, h, k)
 
-    def _check_arguments(self, domain, conds, mthd):
-        """Função principal para as verificações."""
-        self._check_domain(domain)
+    def _set_first_row(self, u, h, k, d_init):
+        """
+        Determina a primeira linha da malha interior. 'd_init' pode ser um
+        escalar ou um vetor de tamanho do 'x'.
+        """
+        u[1:-1, 1] = (u[:, 0] + k * d_init)[1:-1] + k**2 / 2 * \
+                     (u[2:, 0] - 2 * u[1:-1, 0] + u[:-2, 0]) / (h**2)
 
-        self._check_tuple(conds, 'conds')
-        self._check_len(conds, 'conds', 4)
+def _test_Laplace():
+    xn = 3
+    xf = 3.
+    yn = 4
+    yf = 4.
 
-        self._check_mthd(mthd)
+    x = np.linspace(0, xf, xn+1)
+    y = np.linspace(0, yf, yn+1)
 
-def _test_parabolic():
+    f = lambda x, y: (x - 1)**2 - (y - 2)**2
+    bound_x0 = f(0, y)
+    bound_xf = f(xf, y)
+    bound_y0 = f(x, 0)
+    bound_yf = f(x, yf)
+
+    domain = (xn, xf, yn, yf)
+    conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
+    mthd   = 'c'
+
+    u = Laplace().solve(domain, conds, mthd=mthd)
+
+    print(u)
+
+def _test_Parabolic():
     xn = 4
     xf = 4.
     yn = 2
     yf = 1.
+
+    x = np.linspace(0, xf, xn+1)
+    y = np.linspace(0, yf, yn+1)
 
     p = 1
     q = lambda x, y: x - 2.
     r = -3
     s = 0
 
-    init   = lambda x: x**2 - 4*x + 5
-    bound1 = lambda y: 5 * np.exp(-y)
-    bound2 = lambda y: 5 * np.exp(-y)
+    init   = (lambda x: x**2 - 4*x + 5)(x)
+    bound1 = (lambda y: 5 * np.exp(-y))(y)
+    bound2 = (lambda y: 5 * np.exp(-y))(y)
 
     domain = (xn, xf, yn, yf)
     params = (p, q, r, s)
@@ -573,16 +555,19 @@ def _test_parabolic():
 
     print(u)
 
-def _test_wave():
+def _test_Wave():
     xn = 4
     xf = 1.
     yn = 4
     yf = 0.5
 
+    x = np.linspace(0, xf, xn+1)
+    y = np.linspace(0, yf, yn+1)
+
     d_init = 1
-    init   = lambda x: x * (1 - x)
-    bound1 = lambda y: y * (1 - y)
-    bound2 = lambda y: y * (1 - y)
+    init   = (lambda x: x * (1 - x))(x)
+    bound1 = (lambda y: y * (1 - y))(y)
+    bound2 = (lambda y: y * (1 - y))(y)
 
     domain = (xn, xf, yn, yf)
     conds  = (d_init, init, bound1, bound2)
@@ -593,6 +578,8 @@ def _test_wave():
     print(u)
 
 if __name__ == '__main__':
-    _test_parabolic()
+    _test_Laplace()
     print()
-    _test_wave()
+    _test_Parabolic()
+    print()
+    _test_Wave()
