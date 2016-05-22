@@ -11,6 +11,7 @@
 * Função `_mesh_int_grid()` que retorna matrizes 'x' e 'y' conforme o tamanho da malha interior.
 
 **Modificados**
+* Trocar `metaclass=abc.ABCMeta` por `abc.ABC`.
 * Argumento `conds` não pode mais ser tupla de funções, somente escalar e array_like.
 * Função `_check_mthd()`. Trocar `raise Value()` por `sys.exit()`.
 
