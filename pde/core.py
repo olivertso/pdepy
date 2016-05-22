@@ -93,9 +93,6 @@ class Base(abc.ABC):
             elif isinstance(_params[i], (int, float)):
                 _params[i] *= np.ones((len(x)-2, len(y)-1))
 
-            print(_params[i])
-            print()
-
         return _params
 
     def _check_mthd(self, mthd):

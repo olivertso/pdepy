@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## v0.5.1 (2016.05.22)
+**Fixed**
+* Alguns `print()`.
+
 ## v0.5.0 (2016.05.22)
 **Adicionados**
 * Classe base `TimeDependent` para PDEs dependente do tempo.
