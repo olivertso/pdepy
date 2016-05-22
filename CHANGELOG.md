@@ -1,11 +1,15 @@
 # Change Log
 
 ## [Unreleased]
+**Adicionados**
+* Classe base `TimeDependent` para PDEs dependente do tempo.
+* Classe base `SteadyState` para PDEs em estados estacionários.
+* Classe `Laplace` para resolver o problema de condições de contorno da equação de Laplace `u_xx + u_yy = 0`.
 
 ## v0.4.0 (2016-05-21)
 **Adicionados**
-* Nova classe `Base`.
-* Nova classe `Wave` para resolver o problema de condições iniciais e de contorno da equação da onda `u_yy = u_xx` utilizando um método explícito e um implícito.
+* Classe `Base`.
+* Classe `Wave` para resolver o problema de condições iniciais e de contorno da equação da onda `u_yy = u_xx` utilizando um método explícito e um implícito.
 
 **Modificados**
 * Separação da função `_set_system()` em `_set_mat()` e `_set_vec()`.

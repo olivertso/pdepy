@@ -5,38 +5,33 @@ import types
 import numpy as np
 from scipy import linalg
 
-class Base(metaclass=abc.ABCMeta):
+class Base(abc.ABC):
     """
     Classe base.
 
     Funções abstratas
     -----------------
         * solve
-        * _explicit
         * _implicit
         * _set_mat
         * _set_vec
+        * _set_u
         * _cal_constants
+        * _func_to_val
         * _check_arguments
 
     Funções concretas
     -----------------
         * _set_axis
-        * _set_u
-        * _func_to_val
         * _check_tuple
         * _check_len
+        * _check_domain
         * _check_mthd
     """
 
     @abc.abstractmethod
     def solve(self):
         """Função principal."""
-        return
-
-    @abc.abstractmethod
-    def _explicit(self):
-        """Métodos de diferenças finitas explícitos."""
         return
 
     @abc.abstractmethod
@@ -59,9 +54,24 @@ class Base(metaclass=abc.ABCMeta):
         return
 
     @abc.abstractmethod
+    def _set_u(self):
+        """
+        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
+        iniciais e de contorno.
+        """
+        return
+
+    @abc.abstractmethod
     def _cal_constants(self):
         """
-        Calcula as constantes necessárias entre '𝛂', 'β' 'h' e 'k'.
+        Calcula as constantes necessárias entre.
+        """
+        return
+
+    @abc.abstractmethod
+    def _func_to_val(self, func_or_val, *axis):
+        """
+        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
         """
         return
 
@@ -76,6 +86,48 @@ class Base(metaclass=abc.ABCMeta):
         y = np.linspace(0, yf, yn+1)
 
         return (x, y)
+
+    def _check_tuple(self, arg, arg_name):
+        """Verifica se 'arg' é do tipo tupla."""
+        if not isinstance(arg, tuple):
+            raise TypeError('\'' + arg_name + '\' should be a tuple.')
+
+    def _check_len(self, arg, arg_name, exp_len):
+        """Verifica se 'arg' tem tamanho 'exp_len'."""
+        if len(arg) != exp_len:
+            raise ValueError('\'' + arg_name + '\' should have ' + \
+                             str(exp_len) + ' elements, ' + \
+                             str(len(arg)) + ' given.')
+
+    def _check_domain(self, domain):
+        """Verifica argumento 'domain'."""
+        self._check_tuple(domain, 'domain')
+        self._check_len(domain, 'domain', 4)
+
+    def _check_mthd(self, mthd):
+        """Verifica se o método numérico 'mthd' é válido."""
+        if mthd not in self._methods:
+            raise ValueError('Method \'' + mthd + '\' is not valid.')
+
+class TimeDependent(Base):
+    """
+    Classe base para equações diferenciais parciais dependente de uma
+    variável temporal.
+
+    Funções abstratas
+    -----------------
+        * _explicit
+
+    Funções concretas
+    -----------------
+        * _set_u
+        * _func_to_val
+    """
+
+    @abc.abstractmethod
+    def _explicit(self):
+        """Métodos de diferenças finitas explícitos."""
+        return
 
     def _set_u(self, x, y, init, bound_x0, bound_xf):
         """
@@ -117,24 +169,114 @@ class Base(metaclass=abc.ABCMeta):
             # condições, 'func_or_val' não é modificada.
             return func_or_val
 
-    def _check_tuple(self, arg, arg_name):
-        """Verifica se 'arg' é do tipo tupla."""
-        if not isinstance(arg, tuple):
-            raise TypeError('\'' + arg_name + '\' should be a tuple.')
+class SteadyState(Base):
+    """
+    Classe base para equações diferenciais parciais em estados
+    estacionários.
 
-    def _check_len(self, arg, arg_name, exp_len):
-        """Verifica se 'arg' tem tamanho 'exp_len'."""
-        if len(arg) != exp_len:
-            raise ValueError('\'' + arg_name + '\' should have ' + \
-                             str(exp_len) + ' elements, ' + \
-                             str(len(arg)) + ' given.')
+    Funções concretas
+    -----------------
+        * _set_u
+        * _func_to_val
+    """
 
-    def _check_mthd(self, mthd):
-        """Verifica se o método numérico 'mthd' é válido."""
-        if mthd not in self._methods:
-            raise ValueError('Method \'' + mthd + '\' is not valid.')
+    def _set_u(self, x, y, init, bound):
+        """
+        Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
+        de contorno.
+        """
+        u = np.empty((len(x), len(y)))
 
-class Parabolic(Base):
+        # TODO
+
+        return u
+
+    def _func_to_val(self, func_or_val, *axis):
+        """
+        Retorna elemento de 'params' como matriz ou de 'conds' como vetor.
+        """
+
+        # TODO
+
+class Laplace(SteadyState):
+    """
+    Equação de Laplace:
+        u_xx + u_yy = 0.
+
+    Condições de contorno:
+        u(x, y) = bound(x, y), (x, y) pertencente ao contorno.
+    """
+
+    def __init__(self):
+        self.method = ['c', 'u']
+
+    def solve(self, domain, conds, mthd='c'):
+        """
+        Métodos
+        -------
+            * c: diferenças finitas centrais
+            * u: diferenças finitas upwind
+
+        Parâmetros
+        ----------
+        domain : tuple, (int, float, int, float)
+            Tupla da forma (xn, xf, yn, yf), onde 'xn' e 'yn' são os
+            números de partições nos eixos 'x' e 'y'; 'xf' e 'yf' são as
+            posições finais nos eixos 'x' e 'y'.
+        conds : function, scalar or tuple of array_like
+            Condições de contorno. Pode ser uma função f(x, y) sendo 'x'
+            um vetor de tamanho xn+1 e 'y' um escalar ou 'y' um vetor de
+            tamanho yn+1 e 'x' um escalar; ou um escalar; ou uma tupla da
+            forma (cond_x0, cond_xf, cond_y0, cond_yf) onde cada elemento
+            é um vetor de tamanho xn+1 para 'cond_x' e yn+1 para 'cond_y'.
+        mthd : string | optional
+            O método de diferenças finitas escolhido.
+
+        Retornos
+        --------
+        u : ndarray
+            Uma matriz de tamanho (xn+1)*(yn+1) com os resultados, onde
+            cada linha representa uma posição 'x' e cada coluna representa
+            um instante de tempo 'y'.
+        """
+        axis   = self._set_axis(*domain)
+        consts = self._cal_constants(*domain)
+        u      = self._set_u(*axis, *conds)
+
+        self._implicit(u, *consts)
+
+        return u
+
+    def _implicit(self, u, 𝛂, β):
+        """Métodos de diferenças finitas implícitos."""
+        mat = self._set_mat(𝛂, β)
+        vec = self._set_vec(𝛂, β, u)
+
+        x = linalg.solve(mat, vec)
+
+        # TODO: u = np.reshape()
+
+    def _set_mat(self, 𝛂, β):
+        """
+        Monta a matriz do sistema em cada iteração de '_implicit()'.
+        """
+        return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
+
+    def _set_vec(self, 𝛂, β, u):
+        """
+        Monta o vetor do sistema em cada iteração de '_implicit()'.
+        """
+
+        return vec
+
+    def _cal_constants(self, xn, xf, yn, yf):
+        """Calcula as constantes '𝛂' e 'β'."""
+        𝛂 = (xf / xn)**2
+        β = (yf / yn)**2
+
+        return (𝛂, β)
+
+class Parabolic(TimeDependent):
     """
     Equação parabólica linear em derivadas parciais:
         u_y = p(x, y)*u_xx + q(x, y)*u_x + r(x, y)*u + s(x, y).
@@ -230,9 +372,8 @@ class Parabolic(Base):
         main  = - 1 + k * r[:] - 2 * (𝛂 * p[:] + 𝛉 * β * np.abs(q[:]))
         upper = 𝛂 * p[:-1] + β * (𝛉 * np.abs(q[:-1]) + q[:-1])
         lower = 𝛂 * p[1:]  + β * (𝛉 * np.abs(q[1:])  - q[1:] )
-        mat   = np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
-        return mat
+        return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
     def _set_vec(self, 𝛉, 𝛂, β, k, p, q, s, u):
         """
@@ -275,8 +416,7 @@ class Parabolic(Base):
 
     def _check_arguments(self, domain, params, conds, mthd):
         """Função principal para as verificações."""
-        self._check_tuple(domain, 'domain')
-        self._check_len(domain, 'domain', 4)
+        self._check_domain(domain)
 
         self._check_tuple(params, 'params')
         self._check_len(params, 'params', 4)
@@ -286,7 +426,7 @@ class Parabolic(Base):
 
         self._check_mthd(mthd)
 
-class Wave(Base):
+class Wave(TimeDependent):
     """
     Equação da onda:
         u_yy = u_xx.
@@ -402,8 +542,7 @@ class Wave(Base):
 
     def _check_arguments(self, domain, conds, mthd):
         """Função principal para as verificações."""
-        self._check_tuple(domain, 'domain')
-        self._check_len(domain, 'domain', 4)
+        self._check_domain(domain)
 
         self._check_tuple(conds, 'conds')
         self._check_len(conds, 'conds', 4)

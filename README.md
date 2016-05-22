@@ -1,6 +1,7 @@
 # PDE
 
-Finite difference methods for solving initial and boundary value problems of some partial differential equations.
+Finite difference methods for solving initial and boundary value problems of some linear partial differential equations.
 
-* Parabolic PDE
-* Wave Equation
+* Laplace
+* Parabolic
+* Wave
