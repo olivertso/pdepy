@@ -1,8 +1,17 @@
-__all__ = ['Laplace', 'Parabolic', 'Wave']
+__all__ = ['laplace', 'parabolic', 'wave']
 
 import abc, sys, types
 import numpy as np
 from scipy import linalg
+
+def laplace(domain, conds, mthd='c'):
+    return Laplace().solve(domain, conds, mthd)
+
+def parabolic(domain, params, conds, mthd='iu'):
+    return Parabolic().solve(domain, params, conds, mthd)
+
+def wave(domain, conds, mthd='i'):
+    return Wave().solve(domain, conds, mthd)
 
 class Base(abc.ABC):
     """
@@ -181,14 +190,14 @@ class Laplace(SteadyState):
     """
 
     def __init__(self):
-        self._methods = ['c', 'u']
+        self._methods = ['c']
 
-    def solve(self, domain, conds, mthd='c'):
+    def solve(self, domain, conds, mthd):
         """
         Métodos
         -------
             * c: diferenças finitas centrais
-            * u: diferenças finitas upwind
+            * TODO: u: diferenças finitas upwind
 
         Parâmetros
         ----------
@@ -277,7 +286,7 @@ class Parabolic(TimeDependent):
     def __init__(self):
         self._methods = ['ec', 'eu', 'ic', 'iu']
 
-    def solve(self, domain, params, conds, mthd='iu'):
+    def solve(self, domain, params, conds, mthd):
         """
         Métodos
         -------
@@ -407,7 +416,7 @@ class Wave(TimeDependent):
     def __init__(self):
         self._methods = ['e', 'i']
 
-    def solve(self, domain, conds, mthd='i'):
+    def solve(self, domain, conds, mthd):
         """
         Métodos
         -------
@@ -502,7 +511,7 @@ class Wave(TimeDependent):
         u[1:-1, 1] = (u[:, 0] + k * d_init)[1:-1] + k**2 / 2 * \
                      (u[2:, 0] - 2 * u[1:-1, 0] + u[:-2, 0]) / (h**2)
 
-def _test_Laplace():
+def _test_laplace():
     xn = 3
     xf = 3.
     yn = 4
@@ -521,11 +530,11 @@ def _test_Laplace():
     conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
     mthd   = 'c'
 
-    u = Laplace().solve(domain, conds, mthd=mthd)
+    u = laplace(domain, conds, mthd=mthd)
 
     print(u)
 
-def _test_Parabolic():
+def _test_parabolic():
     xn = 4
     xf = 4.
     yn = 2
@@ -548,11 +557,11 @@ def _test_Parabolic():
     conds  = (init, bound1, bound2)
     mthd   = 'iu'
 
-    u = Parabolic().solve(domain, params, conds, mthd=mthd)
+    u = parabolic(domain, params, conds, mthd=mthd)
 
     print(u)
 
-def _test_Wave():
+def _test_wave():
     xn = 4
     xf = 1.
     yn = 4
@@ -570,13 +579,13 @@ def _test_Wave():
     conds  = (d_init, init, bound1, bound2)
     mthd   = 'i'
 
-    u = Wave().solve(domain, conds, mthd=mthd)
+    u = wave(domain, conds, mthd=mthd)
 
     print(u)
 
 if __name__ == '__main__':
-    _test_Laplace()
+    _test_laplace()
     print()
-    _test_Parabolic()
+    _test_parabolic()
     print()
-    _test_Wave()
+    _test_wave()

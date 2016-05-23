@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+**Adicionados**
+* Wrappers para as classes `Laplace`, `Parabolic` e `Wave`.
 
 ## v0.5.1 (2016.05.22)
 **Fixed**
