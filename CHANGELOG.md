@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+**Adicionados**
+* `@classmethod` e `@staticmethod`.
 
 ## v0.5.2 (2016.05.27)
 **Adicionados**

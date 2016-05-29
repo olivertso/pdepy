@@ -5,13 +5,13 @@ import numpy as np
 from scipy import linalg
 
 def laplace(domain, conds, mthd='c'):
-    return Laplace().solve(domain, conds, mthd)
+    return Laplace.solve(domain, conds, mthd)
 
 def parabolic(domain, params, conds, mthd='iu'):
-    return Parabolic().solve(domain, params, conds, mthd)
+    return Parabolic.solve(domain, params, conds, mthd)
 
 def wave(domain, conds, mthd='i'):
-    return Wave().solve(domain, conds, mthd)
+    return Wave.solve(domain, conds, mthd)
 
 class Base(abc.ABC):
     """
@@ -80,14 +80,16 @@ class Base(abc.ABC):
         """
         return
 
-    def _set_axis(self, xn, xf, yn, yf):
+    @staticmethod
+    def _set_axis(xn, xf, yn, yf):
         """Retorna os vetores dos eixos 'x' e 'y'."""
         x = np.linspace(0, xf, xn+1)
         y = np.linspace(0, yf, yn+1)
 
         return (x, y)
 
-    def _set_parameters(self, params, x, y):
+    @classmethod
+    def _set_parameters(cls, params, x, y):
         """
         Atualiza os parâmetros para matrizes de tamanho da malha interior
         de 'u'.
@@ -96,7 +98,7 @@ class Base(abc.ABC):
 
         for i in np.arange(len(_params)):
             if isinstance(_params[i], types.FunctionType):
-                y_m, x_m = self._mesh_int_grid(y, x)
+                y_m, x_m = cls._mesh_int_grid(y, x)
                 _params[i] = _params[i](x_m, y_m)
 
             elif isinstance(_params[i], (int, float)):
@@ -104,9 +106,10 @@ class Base(abc.ABC):
 
         return _params
 
-    def _check_mthd(self, mthd):
+    @classmethod
+    def _check_mthd(cls, mthd):
         """Verifica se o método numérico 'mthd' é válido."""
-        if mthd not in self._methods:
+        if mthd not in cls._methods:
             sys.exit('Value \'' + mthd + '\' for argument \'mthd\' is '
                      'not valid.')
 
@@ -130,7 +133,8 @@ class TimeDependent(Base):
         """Métodos de diferenças finitas explícitos."""
         return
 
-    def _set_u(self, xn, yn, init, bound_x0, bound_xf):
+    @staticmethod
+    def _set_u(xn, yn, init, bound_x0, bound_xf):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
         iniciais e de contorno.
@@ -143,7 +147,8 @@ class TimeDependent(Base):
 
         return u
 
-    def _mesh_int_grid(self, y, x):
+    @staticmethod
+    def _mesh_int_grid(y, x):
         """
         Retorna matrizes 'x' e 'y' de tamanho (xn-2)*(yn-1).
         """
@@ -160,7 +165,8 @@ class SteadyState(Base):
         * _mesh_int_grid
     """
 
-    def _set_u(self, xn, yn, bound_x0, bound_xf, bound_y0, bound_yf):
+    @staticmethod
+    def _set_u(xn, yn, bound_x0, bound_xf, bound_y0, bound_yf):
         """
         Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
         de contorno.
@@ -174,7 +180,8 @@ class SteadyState(Base):
 
         return u
 
-    def _mesh_int_grid(self, y, x):
+    @staticmethod
+    def _mesh_int_grid(y, x):
         """
         Retorna matrizes 'x' e 'y' de tamanho (xn-2)*(yn-2).
         """
@@ -189,10 +196,10 @@ class Laplace(SteadyState):
         u(x, y) = bound(x, y), (x, y) pertencente ao contorno.
     """
 
-    def __init__(self):
-        self._methods = ['c']
+    _methods = ['c']
 
-    def solve(self, domain, conds, mthd):
+    @classmethod
+    def solve(cls, domain, conds, mthd):
         """
         Métodos
         -------
@@ -219,25 +226,27 @@ class Laplace(SteadyState):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        self._check_mthd(mthd)
+        cls._check_mthd(mthd)
 
-        consts = self._cal_constants(*domain)
-        u      = self._set_u(*domain[::2], *conds)
+        consts = cls._cal_constants(*domain)
+        u      = cls._set_u(*domain[::2], *conds)
 
-        self._implicit(u, *domain[::2], *consts)
+        cls._implicit(u, *domain[::2], *consts)
 
         return u
 
-    def _implicit(self, u, xn, yn, 𝛂, β):
+    @classmethod
+    def _implicit(cls, u, xn, yn, 𝛂, β):
         """Métodos de diferenças finitas implícitos."""
-        mat = self._set_mat(𝛂, β, xn, yn)
-        vec = self._set_vec(𝛂, β, u)
+        mat = cls._set_mat(𝛂, β, xn, yn)
+        vec = cls._set_vec(𝛂, β, u)
 
         x = linalg.solve(mat, vec)
 
         u[1:-1, 1:-1] = np.reshape(x, (xn-1, yn-1), 'F')
 
-    def _set_mat(self, 𝛂, β, xn, yn):
+    @staticmethod
+    def _set_mat(𝛂, β, xn, yn):
         """Monta a matriz do sistema em '_implicit()'."""
         n = (xn-1) * (yn-1)
 
@@ -250,7 +259,8 @@ class Laplace(SteadyState):
         return np.diag(main) + np.diag(sub1, 1) + np.diag(sub1, -1) + \
                np.diag(sub2, xn-1) + np.diag(sub2, -xn+1)
 
-    def _set_vec(self, 𝛂, β, u):
+    @staticmethod
+    def _set_vec(𝛂, β, u):
         """Monta o vetor do sistema em '_implicit()'."""
         vec = np.zeros_like((u[1:-1, 1:-1]))
 
@@ -261,7 +271,8 @@ class Laplace(SteadyState):
 
         return np.reshape(vec, np.size(vec), 'F')
 
-    def _cal_constants(self, xn, xf, yn, yf):
+    @staticmethod
+    def _cal_constants(xn, xf, yn, yf):
         """Calcula as constantes '𝛂' e 'β'."""
         𝛂 = (xf / xn)**2
         β = (yf / yn)**2
@@ -283,10 +294,10 @@ class Parabolic(TimeDependent):
         * _set_𝛉
     """
 
-    def __init__(self):
-        self._methods = ['ec', 'eu', 'ic', 'iu']
+    _methods = ['ec', 'eu', 'ic', 'iu']
 
-    def solve(self, domain, params, conds, mthd):
+    @classmethod
+    def solve(cls, domain, params, conds, mthd):
         """
         Métodos
         -------
@@ -319,23 +330,24 @@ class Parabolic(TimeDependent):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        self._check_mthd(mthd)
+        cls._check_mthd(mthd)
 
-        axis   = self._set_axis(*domain)
-        params = self._set_parameters(params, *axis)
-        consts = self._cal_constants(*domain)
-        u      = self._set_u(*domain[::2], *conds)
+        axis   = cls._set_axis(*domain)
+        params = cls._set_parameters(params, *axis)
+        consts = cls._cal_constants(*domain)
+        u      = cls._set_u(*domain[::2], *conds)
 
-        𝛉 = self._set_𝛉(mthd)
+        𝛉 = cls._set_𝛉(mthd)
 
         if mthd[0] == 'e':
-            self._explicit(u, 𝛉, *consts, *params)
+            cls._explicit(u, 𝛉, *consts, *params)
         elif mthd[0] == 'i':
-            self._implicit(u, 𝛉, *consts, *params)
+            cls._implicit(u, 𝛉, *consts, *params)
 
         return u
 
-    def _explicit(self, u, 𝛉, 𝛂, β, k, p, q, r, s):
+    @staticmethod
+    def _explicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
         """Métodos de diferenças finitas explícitos."""
         for j in np.arange(u.shape[1]-1):
             u[1:-1, j+1] = (𝛂 * p[:, j] + \
@@ -349,18 +361,20 @@ class Parabolic(TimeDependent):
                            u[1:-1, j] + \
                            k * s[:, j]
 
-    def _implicit(self, u, 𝛉, 𝛂, β, k, p, q, r, s):
+    @classmethod
+    def _implicit(cls, u, 𝛉, 𝛂, β, k, p, q, r, s):
         """Métodos de diferenças finitas implícitos."""
         for j in np.arange(u.shape[1]-1):
             params1 = (p[:, j], q[:, j], r[:, j])
             params2 = (p[:, j], q[:, j], s[:, j])
 
-            mat = self._set_mat(𝛉, 𝛂, β, k, *params1)
-            vec = self._set_vec(𝛉, 𝛂, β, k, *params2, u[:, j:j+2])
+            mat = cls._set_mat(𝛉, 𝛂, β, k, *params1)
+            vec = cls._set_vec(𝛉, 𝛂, β, k, *params2, u[:, j:j+2])
 
             u[1:-1, j+1] = linalg.solve(mat, vec)
 
-    def _set_mat(self, 𝛉, 𝛂, β, k, p, q, r):
+    @staticmethod
+    def _set_mat(𝛉, 𝛂, β, k, p, q, r):
         """
         Monta a matriz do sistema em cada iteração de '_implicit()'.
         """
@@ -370,7 +384,8 @@ class Parabolic(TimeDependent):
 
         return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
-    def _set_vec(self, 𝛉, 𝛂, β, k, p, q, s, u):
+    @staticmethod
+    def _set_vec(𝛉, 𝛂, β, k, p, q, s, u):
         """
         Monta o vetor do sistema em cada iteração de '_implicit()'.
         """
@@ -380,7 +395,8 @@ class Parabolic(TimeDependent):
 
         return vec
 
-    def _cal_constants(self, xn, xf, yn, yf):
+    @staticmethod
+    def _cal_constants(xn, xf, yn, yf):
         """Calcula as constantes '𝛂', 'β' e 'k'."""
         h = xf / xn
         k = yf / yn
@@ -390,7 +406,8 @@ class Parabolic(TimeDependent):
 
         return (𝛂, β, k)
 
-    def _set_𝛉(self, mthd):
+    @staticmethod
+    def _set_𝛉(mthd):
         """Retorna o valor de '𝛉' conforme 'mthd'."""
         if mthd[1] =='c':
             return 0
@@ -413,10 +430,10 @@ class Wave(TimeDependent):
         * _set_first_row
     """
 
-    def __init__(self):
-        self._methods = ['e', 'i']
+    _methods = ['e', 'i']
 
-    def solve(self, domain, conds, mthd):
+    @classmethod
+    def solve(cls, domain, conds, mthd):
         """
         Métodos
         -------
@@ -443,36 +460,39 @@ class Wave(TimeDependent):
             cada linha representa uma posição 'x' e cada coluna representa
             um instante de tempo 'y'.
         """
-        self._check_mthd(mthd)
+        cls._check_mthd(mthd)
 
-        consts = self._cal_constants(*domain)
-        u      = self._set_u(*domain[::2], *conds[1:])
+        consts = cls._cal_constants(*domain)
+        u      = cls._set_u(*domain[::2], *conds[1:])
 
-        self._set_first_row(u, *consts[1:], conds[0])
+        cls._set_first_row(u, *consts[1:], conds[0])
 
         if mthd == 'e':
-            self._explicit(u, consts[0]**(-1))
+            cls._explicit(u, consts[0]**(-1))
         elif mthd == 'i':
-            self._implicit(u, consts[0]**(-1))
+            cls._implicit(u, consts[0]**(-1))
 
         return u
 
-    def _explicit(self, u, 𝛂):
+    @staticmethod
+    def _explicit(u, 𝛂):
         """Métodos de diferenças finitas explícitos."""
         for j in np.arange(1, u.shape[1]-1):
             u[1:-1, j+1] = 2 * u[1:-1, j] - u[1:-1, j-1] + \
                            𝛂 * (u[2:, j] - 2 * u[1:-1, j] + u[:-2, j])
 
-    def _implicit(self, u, 𝛂):
+    @classmethod
+    def _implicit(cls, u, 𝛂):
         """Métodos de diferenças finitas implícitos."""
-        mat = self._set_mat(np.shape(u)[0]-2, 𝛂)
+        mat = cls._set_mat(np.shape(u)[0]-2, 𝛂)
 
         for j in np.arange(1, u.shape[1]-1):
-            vec = self._set_vec(𝛂, u[:, j-1:j+2])
+            vec = cls._set_vec(𝛂, u[:, j-1:j+2])
 
             u[1:-1, j+1] = linalg.solve(mat, vec)
 
-    def _set_mat(self, n, 𝛂):
+    @staticmethod
+    def _set_mat(n, 𝛂):
         """
         Monta a matriz do sistema em cada iteração de '_implicit()'.
         """
@@ -482,7 +502,8 @@ class Wave(TimeDependent):
 
         return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
-    def _set_vec(self, 𝛂, u):
+    @staticmethod
+    def _set_vec(𝛂, u):
         """
         Monta o vetor do sistema em cada iteração de '_implicit()'.
         """
@@ -494,7 +515,8 @@ class Wave(TimeDependent):
 
         return vec
 
-    def _cal_constants(self, xn, xf, yn, yf):
+    @staticmethod
+    def _cal_constants(xn, xf, yn, yf):
         """Calcula as constantes '𝛂', 'h' e 'k'."""
         h = xf / xn
         k = yf / yn
@@ -503,7 +525,8 @@ class Wave(TimeDependent):
 
         return (𝛂, h, k)
 
-    def _set_first_row(self, u, h, k, d_init):
+    @staticmethod
+    def _set_first_row(u, h, k, d_init):
         """
         Determina a primeira linha da malha interior. 'd_init' pode ser um
         escalar ou um vetor de tamanho do 'x'.
