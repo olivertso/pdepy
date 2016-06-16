@@ -7,7 +7,7 @@ import sys
 
 import numpy as np
 
-__all__ = ['set_axis', 'check_method']
+__all__ = ['check_method']
 
 def check_method(method, methods):
     """Verifica se o método numérico 'method' é válido."""
