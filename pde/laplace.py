@@ -63,7 +63,7 @@ def _set_mat(𝛂, β, xn, yn):
     """Monta a matriz do sistema em '_implicit()'."""
     n = (xn-1) * (yn-1)
 
-    main = np.full(n, - 2 * (𝛂 + β))
+    main = np.full(n, - 2 * (𝛂+β))
     sub1 = np.full(n-1, β)
     sub2 = np.full(n-xn+1, 𝛂)
 
@@ -85,7 +85,7 @@ def _set_vec(𝛂, β, u):
 
 def _cal_constants(xn, xf, yn, yf):
     """Calcula as constantes '𝛂' e 'β'."""
-    𝛂 = (xf / xn)**2
-    β = (yf / yn)**2
+    𝛂 = (xf/xn) ** 2
+    β = (yf/yn) ** 2
 
     return (𝛂, β)

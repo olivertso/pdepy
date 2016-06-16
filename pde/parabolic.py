@@ -109,7 +109,7 @@ def _cal_constants(xn, xf, yn, yf):
     k = yf / yn
 
     𝛂 = k / h**2
-    β = k / (2 * h)
+    β = k / (2*h)
 
     return (𝛂, β, k)
 

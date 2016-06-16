@@ -1,9 +1,14 @@
 # Change Log
 
 ## [Unreleased]
+
+## v0.6.0 (2016.06.16)
 **Adicionados**
 * Sublime project.
-* *base.py*, *steady.py*, *time.py*, *laplace.py* e *tests.py*.
+* *base.py*, *steady.py*, *time.py*, *laplace.py*, *parabolic.py*, *wave.py* e *tests.py*.
+
+**Removidos**
+* *core.py*.
 
 ## v0.5.3 (2016.05.31)
 **Adicionados**
