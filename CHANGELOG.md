@@ -3,6 +3,7 @@
 ## [Unreleased]
 **Adicionados**
 * Sublime project.
+* *base.py*, *steady.py*, *time.py*, *laplace.py* e *tests.py*.
 
 ## v0.5.3 (2016.05.31)
 **Adicionados**
