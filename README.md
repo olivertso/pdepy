@@ -1,3 +1,3 @@
 # pde
 
-Métodos das diferenças finitas para equações diferenciais parciais.
+Finite-Difference PDE solver

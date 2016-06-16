@@ -1,6 +1,8 @@
 # Change Log
 
 ## [Unreleased]
+**Adicionados**
+* Sublime project.
 
 ## v0.5.3 (2016.05.31)
 **Adicionados**

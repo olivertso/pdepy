@@ -1,0 +1,32 @@
+{
+    "folders":
+    [
+        {
+            "path": "."
+        }
+    ],
+    "settings":
+    [
+        {
+            "ensure_newline_at_eof_on_save": true,
+            "tab_size": 4,
+            "translate_tabs_to_spaces": true
+        }
+    ],
+    "build_systems":
+    [
+        {
+            "name": "Numenv3",
+            "cmd":
+            [
+                "/Users/olivertso/PyEnvs/numenv3/bin/python",
+                "-u",
+                "$file"
+                // "$project_path/tests/ado.py"
+            ],
+            "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
+            "selector": "source.python",
+            "env": {"LANG": "en_US.UTF-8"}
+        }
+    ]
+}

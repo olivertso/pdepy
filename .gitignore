@@ -61,6 +61,9 @@ target/
 # Ipython Notebook
 .ipynb_checkpoints
 
+# Sublime Text 3
+*.sublime-workspace
+
 # OS generated files
 .DS_Store*
 .VolumeIcon.icns
