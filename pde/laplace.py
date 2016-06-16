@@ -30,7 +30,7 @@ def solve(domain, conds, method='c'):
         axis 'x' and 'y', 'xf' and 'yf' are the final positions; [int,
         float, int, float].
     conds : array_like
-        Boundary conditions, [bound_x0, bound_xf, bound_y0, bound_yf];
+        Boundary conditions; [bound_x0, bound_xf, bound_y0, bound_yf],
         each element should be a scalar or an array_like of size 'xn+1'
         for 'cond_x' and size 'yn+1' for 'cond_y'.
     method : string | optional
