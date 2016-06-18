@@ -14,14 +14,14 @@ from . import steady
 
 __all__ = ['solve']
 
-_METHODS = ['c']
+_METHODS = ['ic']
 
-def solve(domain, conds, method='c'):
+def solve(domain, conds, method='ic'):
     """
     Methods
     -------
-        * c: central
-        * TODO: u: upwind
+        * ic: implicit central
+        * TODO: iu: implicit upwind
 
     Parameters
     ----------

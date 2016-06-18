@@ -1,3 +1,3 @@
 # pde
 
-Finite-Difference PDE solver
+A Finite-Difference PDE solver.

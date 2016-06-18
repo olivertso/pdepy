@@ -42,7 +42,7 @@ def test_laplace():
 
     domain = (xn, xf, yn, yf)
     conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
-    method = 'c'
+    method = 'ic'
 
     u = laplace.solve(domain, conds, method=method)
 
