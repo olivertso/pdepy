@@ -51,29 +51,32 @@ def test_laplace():
 def test_parabolic():
     xn = 4
     xf = 4.
-    yn = 2
-    yf = 1.
+    yn = 5
+    yf = 0.5
 
     x = np.linspace(0, xf, xn+1)
     y = np.linspace(0, yf, yn+1)
-
-    p = np.ones((xn-1, yn))
-    q = (lambda x: x - np.ones((xn-1, yn))*2.)(x[1:-1, np.newaxis])
-    r = np.ones((xn-1, yn)) * (-3)
-    s = np.zeros((xn-1, yn))
 
     init   = (lambda x: x**2 - 4*x + 5)(x)
     bound1 = (lambda y: 5 * np.exp(-y))(y)
     bound2 = (lambda y: 5 * np.exp(-y))(y)
 
+    p = 1
+    q = 1
+    r = -3
+    s = 3
+
     domain = (xn, xf, yn, yf)
-    params = (p, q, r, s)
     conds  = (init, bound1, bound2)
-    method = 'iu'
+    params = (p, q, r, s)
 
-    u = parabolic.solve(domain, params, conds, method=method)
-
-    print(u)
+    print(parabolic.solve(domain, params, conds, method='ec'))
+    print()
+    print(parabolic.solve(domain, params, conds, method='eu'))
+    print()
+    print(parabolic.solve(domain, params, conds, method='ic'))
+    print()
+    print(parabolic.solve(domain, params, conds, method='iu'))
 
 def test_wave():
     xn = 4
@@ -97,8 +100,8 @@ def test_wave():
 
     print(u)
 
-test_laplace()
-print()
+# test_laplace()
+# print()
 test_parabolic()
-print()
-test_wave()
+# print()
+# test_wave()
