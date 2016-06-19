@@ -5,18 +5,6 @@ TODO:
  [-4., -1., -0., -1., -4.],
  [-3., -0.,  1., -0., -3.],
  [ 0.,  3.,  4.,  3.,  0.]]
-
-[[ 5., 3.0326533 , 1.83939721],
- [ 2., 1.341799  , 0.84953551],
- [ 1., 0.66908543, 0.4338917 ],
- [ 2., 1.341799  , 0.84953551],
- [ 5., 3.0326533 , 1.83939721]]
-
-[[ 0.    , 0.109375, 0.1875, 0.234375, 0.25  ],
- [ 0.1875, 0.296875, 0.375 , 0.421875, 0.4375],
- [ 0.25  , 0.359375, 0.4375, 0.484375, 0.5   ],
- [ 0.1875, 0.296875, 0.375 , 0.421875, 0.4375],
- [ 0.    , 0.109375, 0.1875, 0.234375, 0.25  ]]
 """
 
 import numpy as np
@@ -42,11 +30,8 @@ def test_laplace():
 
     domain = (xn, xf, yn, yf)
     conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
-    method = 'ic'
 
-    u = laplace.solve(domain, conds, method=method)
-
-    print(u)
+    print(laplace.solve(domain, conds, method='ic'))
 
 def test_parabolic():
     xn = 4
@@ -82,7 +67,7 @@ def test_wave():
     xn = 4
     xf = 1.
     yn = 4
-    yf = 0.5
+    yf = 1.
 
     x = np.linspace(0, xf, xn+1)
     y = np.linspace(0, yf, yn+1)
@@ -94,14 +79,13 @@ def test_wave():
 
     domain = (xn, xf, yn, yf)
     conds  = (d_init, init, bound1, bound2)
-    method = 'i'
 
-    u = wave.solve(domain, conds, method=method)
+    print(wave.solve(domain, conds, method='e'))
+    print()
+    print(wave.solve(domain, conds, method='i'))
 
-    print(u)
-
-# test_laplace()
+test_laplace()
 # print()
-test_parabolic()
+# test_parabolic()
 # print()
 # test_wave()

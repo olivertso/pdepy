@@ -43,7 +43,7 @@ def solve(domain, conds, method='ic'):
     """
     base.check_method(method, _METHODS)
 
-    u      = steady.set_u(*domain[::2], *conds)
+    u = steady.set_u(*domain[::2], *conds)
     consts = _cal_constants(*domain)
 
     _implicit(u, *domain[::2], *consts)
@@ -63,7 +63,7 @@ def _set_mat(𝛂, β, xn, yn):
     """Monta a matriz do sistema em '_implicit()'."""
     n = (xn-1) * (yn-1)
 
-    main = np.full(n, - 2 * (𝛂+β))
+    main = np.full(n, -2*(𝛂+β))
     sub1 = np.full(n-1, β)
     sub2 = np.full(n-xn+1, 𝛂)
 
