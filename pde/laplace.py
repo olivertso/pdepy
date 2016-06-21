@@ -21,7 +21,6 @@ def solve(domain, conds, method='ic'):
     Methods
     -------
         * ic: implicit central
-        * TODO: iu: implicit upwind
 
     Parameters
     ----------
