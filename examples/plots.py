@@ -1,15 +1,14 @@
-"""TODO"""
-
 import numpy as np
 
 from pde import laplace
 from pde import parabolic
 from pde import wave
+from pde import plttool
 
-def test_laplace():
-    xn = 3
+def plot_laplace():
+    xn = 30
     xf = 3.
-    yn = 4
+    yn = 40
     yf = 4.
 
     x = np.linspace(0, xf, xn+1)
@@ -24,12 +23,12 @@ def test_laplace():
     domain = (xn, xf, yn, yf)
     conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
 
-    print(laplace.solve(domain, conds, method='ic'))
+    plttool.surface(laplace.solve(domain, conds, method='ic'), x, y)
 
-def test_parabolic():
-    xn = 4
+def plot_parabolic():
+    xn = 40
     xf = 4.
-    yn = 5
+    yn = 50
     yf = 0.5
 
     x = np.linspace(0, xf, xn+1)
@@ -48,18 +47,12 @@ def test_parabolic():
     conds  = (init, bound1, bound2)
     params = (p, q, r, s)
 
-    print(parabolic.solve(domain, params, conds, method='ec'))
-    print()
-    print(parabolic.solve(domain, params, conds, method='eu'))
-    print()
-    print(parabolic.solve(domain, params, conds, method='ic'))
-    print()
-    print(parabolic.solve(domain, params, conds, method='iu'))
+    plttool.surface(parabolic.solve(domain, params, conds, method='iu'), x, y)
 
-def test_wave():
-    xn = 4
+def plot_wave():
+    xn = 40
     xf = 1.
-    yn = 4
+    yn = 40
     yf = 1.
 
     x = np.linspace(0, xf, xn+1)
@@ -73,12 +66,8 @@ def test_wave():
     domain = (xn, xf, yn, yf)
     conds  = (d_init, init, bound1, bound2)
 
-    print(wave.solve(domain, conds, method='e'))
-    print()
-    print(wave.solve(domain, conds, method='i'))
+    plttool.surface(wave.solve(domain, conds, method='i'), x, y)
 
-test_laplace()
-# print()
-# test_parabolic()
-# print()
-# test_wave()
+plot_laplace()
+plot_parabolic()
+plot_wave()
