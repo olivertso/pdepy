@@ -1,9 +1,26 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import cm
+from mpl_toolkits.mplot3d import Axes3D
 
 from pde import laplace
 from pde import parabolic
 from pde import wave
-from pde import plttool
+
+def surface(u, x, y):
+    """3d surface plot."""
+    fig = plt.figure()
+    ax  = fig.gca(projection='3d')
+
+    y_mesh, x_mesh = np.meshgrid(y, x)
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('u')
+    ax.plot_trisurf(x_mesh.flatten(), y_mesh.flatten(), u.flatten(),
+                    cmap=cm.jet, linewidth=0.2)
+
+    plt.show()
 
 def plot_laplace():
     xn = 30
@@ -23,7 +40,7 @@ def plot_laplace():
     domain = (xn, xf, yn, yf)
     conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
 
-    plttool.surface(laplace.solve(domain, conds, method='ic'), x, y)
+    surface(laplace.solve(domain, conds, method='ic'), x, y)
 
 def plot_parabolic():
     xn = 40
@@ -47,7 +64,7 @@ def plot_parabolic():
     conds  = (init, bound1, bound2)
     params = (p, q, r, s)
 
-    plttool.surface(parabolic.solve(domain, params, conds, method='iu'), x, y)
+    surface(parabolic.solve(domain, params, conds, method='iu'), x, y)
 
 def plot_wave():
     xn = 40
@@ -66,7 +83,7 @@ def plot_wave():
     domain = (xn, xf, yn, yf)
     conds  = (d_init, init, bound1, bound2)
 
-    plttool.surface(wave.solve(domain, conds, method='i'), x, y)
+    surface(wave.solve(domain, conds, method='i'), x, y)
 
 plot_laplace()
 plot_parabolic()

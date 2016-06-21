@@ -7,7 +7,6 @@ setup(
     packages=['pde'],
     install_requires = [
         'numpy',
-        'scipy',
-        'matplotlib'
+        'scipy'
     ]
 )
