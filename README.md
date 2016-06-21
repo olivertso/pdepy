@@ -12,3 +12,11 @@ A python 3 library for solving initial and boundary value problems of some linea
 * Wave
   * explicit
   * implicit
+
+## Examples
+
+See the code in examples/plots.py, running it should get:
+
+ Laplace | Parabolic | Wave
+:-------:|:---------:|:----:
+![Alt text](/examples/fig_laplace.png?raw=true "fig_laplace") | ![Alt text](/examples/fig_parabolic.png?raw=true "fig_parabolic") | ![Alt text](/examples/fig_wave.png?raw=true "fig_wave")
