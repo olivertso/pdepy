@@ -22,8 +22,8 @@
                 "/Users/olivertso/PyEnvs/numenv3/bin/python",
                 "-u",
                 // "$file"
-                // "$project_path/tests.py"
-                "$project_path/examples/plots.py"
+                "$project_path/tests.py"
+                // "$project_path/examples/plots.py"
             ],
             "file_regex": "^[ ]*File \"(...*?)\", line ([0-9]*)",
             "selector": "source.python",

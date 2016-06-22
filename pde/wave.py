@@ -19,7 +19,7 @@ __all__ = ['solve']
 
 _METHODS = ['e', 'i']
 
-def solve(domain, conds, method='i'):
+def solve(axis, conds, method='i'):
     """
     Methods
     -------
@@ -28,26 +28,24 @@ def solve(domain, conds, method='i'):
 
     Parameters
     ----------
-    domain : array_like
-        [xn, xf, yn, yf], 'xn' and 'yn' are the number of partitions at
-        axis 'x' and 'y', 'xf' and 'yf' are the final positions; [int,
-        float, int, float].
+    axis : array_like
+        Axis 'x' and 'y'; [x, y], each element should be an array_like.
     conds : array_like
         Initial and boundary conditions; [init, bound_x0, bound_xf], each
-        element should be a scalar or an array_like of size 'xn+1' for
-        'cond_x' and size 'yn+1' for 'cond_y'.
+        element should be a scalar or an array_like of size of 'x' for
+        'cond_x' and size of 'y' for 'cond_y'.
     method : string | optional
         Finite-difference method.
 
     Returns
     -------
     u : ndarray
-        A matrix of size (xn+1)*(yn+1); u[x, y].
+        A 2-D ndarray; u[x, y].
     """
     base.check_method(method, _METHODS)
 
-    u = time.set_u(*domain[::2], *conds[1:])
-    consts = _cal_constants(*domain)
+    u = time.set_u(*axis, *conds[1:])
+    consts = _cal_constants(*axis)
 
     _set_first_row(u, *consts[1:], conds[0])
 
@@ -90,10 +88,10 @@ def _set_vec(𝛂, u):
 
     return vec
 
-def _cal_constants(xn, xf, yn, yf):
+def _cal_constants(x, y):
     """Calcula as constantes '𝛂', 'h' e 'k'."""
-    h = xf / xn
-    k = yf / yn
+    h = x[-1] / (x.size-1)
+    k = y[-1] / (y.size-1)
 
     𝛂 = k**2 / h**2
 

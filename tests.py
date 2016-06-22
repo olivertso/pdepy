@@ -44,7 +44,7 @@ def test_parabolic():
     r = -3
     s = 3
 
-    domain = (xn, xf, yn, yf)
+    domain = (x, y)
     conds  = (init, bound1, bound2)
     params = (p, q, r, s)
 
@@ -70,15 +70,15 @@ def test_wave():
     bound1 = (lambda y: y * (1-y))(y)
     bound2 = (lambda y: y * (1-y))(y)
 
-    domain = (xn, xf, yn, yf)
+    domain = (x, y)
     conds  = (d_init, init, bound1, bound2)
 
     print(wave.solve(domain, conds, method='e'))
     print()
     print(wave.solve(domain, conds, method='i'))
 
-test_laplace()
+# test_laplace()
 # print()
-# test_parabolic()
+test_parabolic()
 # print()
 # test_wave()
