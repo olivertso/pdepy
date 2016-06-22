@@ -21,10 +21,10 @@ def test_laplace():
     bound_y0 = f(x, 0)
     bound_yf = f(x, yf)
 
-    domain = (xn, xf, yn, yf)
-    conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
+    axis  = (x, y)
+    conds = (bound_x0, bound_xf, bound_y0, bound_yf)
 
-    print(laplace.solve(domain, conds, method='ic'))
+    print(laplace.solve(axis, conds, method='ic'))
 
 def test_parabolic():
     xn = 4
@@ -44,17 +44,17 @@ def test_parabolic():
     r = -3
     s = 3
 
-    domain = (x, y)
+    axis   = (x, y)
     conds  = (init, bound1, bound2)
     params = (p, q, r, s)
 
-    print(parabolic.solve(domain, params, conds, method='ec'))
+    print(parabolic.solve(axis, params, conds, method='ec'))
     print()
-    print(parabolic.solve(domain, params, conds, method='eu'))
+    print(parabolic.solve(axis, params, conds, method='eu'))
     print()
-    print(parabolic.solve(domain, params, conds, method='ic'))
+    print(parabolic.solve(axis, params, conds, method='ic'))
     print()
-    print(parabolic.solve(domain, params, conds, method='iu'))
+    print(parabolic.solve(axis, params, conds, method='iu'))
 
 def test_wave():
     xn = 4
@@ -70,15 +70,15 @@ def test_wave():
     bound1 = (lambda y: y * (1-y))(y)
     bound2 = (lambda y: y * (1-y))(y)
 
-    domain = (x, y)
-    conds  = (d_init, init, bound1, bound2)
+    axis  = (x, y)
+    conds = (d_init, init, bound1, bound2)
 
-    print(wave.solve(domain, conds, method='e'))
+    print(wave.solve(axis, conds, method='e'))
     print()
-    print(wave.solve(domain, conds, method='i'))
+    print(wave.solve(axis, conds, method='i'))
 
-# test_laplace()
+test_laplace()
 # print()
-test_parabolic()
+# test_parabolic()
 # print()
 # test_wave()

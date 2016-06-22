@@ -7,12 +7,9 @@ import numpy as np
 
 __all__ = ['set_u']
 
-def set_u(xn, yn, bound_x0, bound_xf, bound_y0, bound_yf):
-    """
-    Inicializa a matriz 'u' de tamanho (xn+1)*(yn+1) com as condições
-    de contorno.
-    """
-    u = np.empty((xn+1, yn+1))
+def set_u(x, y, bound_x0, bound_xf, bound_y0, bound_yf):
+    """Inicializa a matriz 'u' com as condições de contorno."""
+    u = np.empty((x.size, y.size))
 
     u[0, :]  = bound_x0
     u[-1, :] = bound_xf

@@ -37,10 +37,10 @@ def plot_laplace():
     bound_y0 = f(x, 0)
     bound_yf = f(x, yf)
 
-    domain = (xn, xf, yn, yf)
-    conds  = (bound_x0, bound_xf, bound_y0, bound_yf)
+    axis  = (x, y)
+    conds = (bound_x0, bound_xf, bound_y0, bound_yf)
 
-    surface(laplace.solve(domain, conds, method='ic'), x, y)
+    surface(laplace.solve(axis, conds, method='ic'), x, y)
 
 def plot_parabolic():
     xn = 40
@@ -60,11 +60,11 @@ def plot_parabolic():
     r = -3
     s = 3
 
-    domain = (xn, xf, yn, yf)
+    axis   = (x, y)
     conds  = (init, bound1, bound2)
     params = (p, q, r, s)
 
-    surface(parabolic.solve(domain, params, conds, method='iu'), x, y)
+    surface(parabolic.solve(axis, params, conds, method='iu'), x, y)
 
 def plot_wave():
     xn = 40
@@ -80,10 +80,10 @@ def plot_wave():
     bound1 = (lambda y: y * (1-y))(y)
     bound2 = (lambda y: y * (1-y))(y)
 
-    domain = (xn, xf, yn, yf)
-    conds  = (d_init, init, bound1, bound2)
+    axis  = (x, y)
+    conds = (d_init, init, bound1, bound2)
 
-    surface(wave.solve(domain, conds, method='i'), x, y)
+    surface(wave.solve(axis, conds, method='i'), x, y)
 
 plot_laplace()
 plot_parabolic()

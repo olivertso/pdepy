@@ -33,7 +33,7 @@ def solve(axis, conds, method='i'):
     conds : array_like
         Initial and boundary conditions; [init, bound_x0, bound_xf], each
         element should be a scalar or an array_like of size of 'x' for
-        'cond_x' and size of 'y' for 'cond_y'.
+        'init' and size of 'y' for 'cond_x's.
     method : string | optional
         Finite-difference method.
 

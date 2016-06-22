@@ -6,6 +6,7 @@
 
 **Modificados**
 * Simplificação da equação parabólica: parâmetros *p*, *q*, *r* e *s* dependentes das variáveis *x* e *y* passam a ser constantes.
+* Arugumento `domain` -> `axis`.
 
 ## v0.6.0 (2016.06.16)
 **Adicionados**
