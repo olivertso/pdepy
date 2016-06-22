@@ -15,7 +15,7 @@ A python 3 library for solving initial and boundary value problems of some linea
 
 ## Examples
 
-Code in examples.ipynb.
+Code in examples.py.
 
  Laplace | Parabolic | Wave
 :-------:|:---------:|:----:

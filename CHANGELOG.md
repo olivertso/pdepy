@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 **Adicionados**
-* Exemplos com plots em *examples.ipynb*.
+* Exemplos com plots em *examples.py*.
 
 **Modificados**
 * Simplificação da equação parabólica: parâmetros *p*, *q*, *r* e *s* dependentes das variáveis *x* e *y* passam a ser constantes.
