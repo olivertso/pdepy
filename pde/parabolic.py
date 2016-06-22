@@ -36,8 +36,8 @@ def solve(axis, params, conds, method='iu'):
         be a scalar.
     conds : array_like
         Initial and boundary conditions; [init, bound_x0, bound_xf], each
-        element should be a scalar or an array_like of size of 'x' for
-        'init' and size of 'y' for 'cond_x's.
+        element should be a scalar or an array_like of size 'x.size' for
+        'init' and 'y.size' for 'bound_x'.
     method : string | optional
         Finite-difference method.
 

@@ -28,8 +28,8 @@ def solve(axis, conds, method='ic'):
         Axis 'x' and 'y'; [x, y], each element should be an array_like.
     conds : array_like
         Boundary conditions; [bound_x0, bound_xf, bound_y0, bound_yf],
-        each element should be a scalar or an array_like of size of 'x'
-        for 'cond_y's and size of 'y' for 'cond_x's.
+        each element should be a scalar or an array_like of size 'x.size'
+        for 'bound_y' and 'y.size' for 'bound_x'.
     method : string | optional
         Finite-difference method.
 
