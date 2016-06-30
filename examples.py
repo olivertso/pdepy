@@ -9,16 +9,20 @@ from pde import wave
 
 def surface(u, x, y):
     """3d surface plot."""
-    fig = plt.figure()
-    ax  = fig.gca(projection='3d')
-
     y_mesh, x_mesh = np.meshgrid(y, x)
 
+    fig = plt.figure()
+    ax  = fig.gca(projection='3d')
+    ax.plot_trisurf(
+        x_mesh.flatten(),
+        y_mesh.flatten(),
+        u.flatten(),
+        cmap=cm.Spectral,
+        edgecolor='none'
+    )
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_zlabel('u')
-    ax.plot_trisurf(x_mesh.flatten(), y_mesh.flatten(), u.flatten(),
-                    cmap=cm.jet, linewidth=0.2)
 
     plt.show()
 
