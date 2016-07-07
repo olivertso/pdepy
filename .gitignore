@@ -63,6 +63,7 @@ target/
 
 # Sublime Text 3
 *.sublime-workspace
+*.sublime-project
 
 # OS generated files
 .DS_Store*
