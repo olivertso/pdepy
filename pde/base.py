@@ -5,8 +5,6 @@ para equações diferenciais parciais.
 
 import sys
 
-import numpy as np
-
 __all__ = ['check_method']
 
 def check_method(method, methods):
