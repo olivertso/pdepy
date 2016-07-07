@@ -3,12 +3,12 @@
 ## [Unreleased]
 **Adicionados**
 * Exemplos com plots em *examples.py*.
-* Sublime project.
 * *base.py*, *steady.py*, *time.py*, *laplace.py*, *parabolic.py*, *wave.py* e *tests.py*.
 
 **Modificados**
 * Simplificação da equação parabólica: parâmetros *p*, *q*, *r* e *s* dependentes das variáveis *x* e *y* passam a ser constantes.
 * Argumento `domain` -> `axis`.
+* Testes para nose2.
 
 **Removidos**
 * *core.py*.
