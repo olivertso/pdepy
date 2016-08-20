@@ -1,5 +1,3 @@
-# PDE
-
 A python 3 library for solving initial and boundary value problems of some linear partial differential equations using finite-difference methods.
 
 * Laplace
