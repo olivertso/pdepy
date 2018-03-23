@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from pde import parabolic
+from pdepy import parabolic
 
 expect_parabolic_ec = [
     [5., 4.52418709, 4.09365377, 3.7040911, 3.35160023, 3.0326533],

@@ -14,12 +14,12 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pde-solver',
+    name='pdepy',
     version='1.0.0a0',
     description='A Finite-Difference PDE solver.',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/olivertso/pde',
+    url='https://github.com/olivertso/pdepy',
     author='Oliver Hung Buo Tso',
     author_email='olivertsor@gmail.com',
     classifiers=[
@@ -36,7 +36,7 @@ setup(
         'Topic :: Scientific/Engineering :: Physics'
     ],
     keywords='partial-differential-equations finite-difference-method',
-    packages=['pde'],
+    packages=['pdepy'],
     python_requires='>=3',
     install_requires=[
         'numpy==1.14.2',

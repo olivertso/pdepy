@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from pde import laplace
+from pdepy import laplace
 
 expect_laplace_ic = [
     [-3.,  0.,  1.,  0., -3.],

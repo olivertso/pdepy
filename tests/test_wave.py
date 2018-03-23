@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from pde import wave
+from pdepy import wave
 
 expect_wave_e_i = [
     [0., 0.1875, 0.25, 0.1875, 0.],

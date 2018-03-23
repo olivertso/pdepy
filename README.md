@@ -15,7 +15,7 @@ A python 3 library for solving initial and boundary value problems of some linea
 
 ```
 >>> import numpy as np
->>> from pde import wave
+>>> from pdepy import wave
 >>> x = np.linspace(0, 1., 5)
 >>> y = np.linspace(0, 1., 5)
 >>> d_init = 1.
