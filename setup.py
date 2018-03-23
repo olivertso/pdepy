@@ -14,7 +14,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='pde',
+    name='pde-solver',
     version='1.0.0a0',
     description='A Finite-Difference PDE solver.',
     long_description=long_description,
