@@ -12,12 +12,12 @@ Initial and boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base
-from . import time
+from . import base, time
 
 __all__ = ['solve']
 
 _METHODS = ['e', 'i']
+
 
 def solve(axis, conds, method='i'):
     """
@@ -56,11 +56,13 @@ def solve(axis, conds, method='i'):
 
     return u
 
+
 def _explicit(u, 𝛂):
     """Métodos de diferenças finitas explícitos."""
     for j in np.arange(1, u.shape[1]-1):
         u[1:-1, j+1] = 2*u[1:-1, j] - u[1:-1, j-1] + \
                        𝛂*(u[2:, j] - 2*u[1:-1, j] + u[:-2, j])
+
 
 def _implicit(u, 𝛂):
     """Métodos de diferenças finitas implícitos."""
@@ -71,22 +73,25 @@ def _implicit(u, 𝛂):
 
         u[1:-1, j+1] = linalg.solve(mat, vec)
 
+
 def _set_mat(n, 𝛂):
     """Monta a matriz do sistema em cada iteração de '_implicit()'."""
-    main  = - 2*(np.ones(n) + 𝛂)
+    main = - 2*(np.ones(n) + 𝛂)
     upper = np.ones(n-1)
     lower = np.ones(n-1)
 
     return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
+
 def _set_vec(𝛂, u):
     """Monta o vetor do sistema em cada iteração de '_implicit()'."""
     vec = - u[:-2, 0] - u[2:, 0] + 2*(1+𝛂)*u[1:-1, 0] - 4*𝛂*u[1:-1, 1]
 
-    vec[0]  -= u[0, 2]
+    vec[0] -= u[0, 2]
     vec[-1] -= u[-1, 2]
 
     return vec
+
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂', 'h' e 'k'."""
@@ -97,10 +102,10 @@ def _cal_constants(x, y):
 
     return (𝛂, h, k)
 
+
 def _set_first_row(u, h, k, d_init):
     """
     Determina a primeira linha da malha interior. 'd_init' pode ser um
     escalar ou um vetor de tamanho do 'x'.
     """
-    u[1:-1, 1] = (u[:, 0] + k*d_init)[1:-1] + k**2 / 2 * \
-                 (u[2:, 0] - 2*u[1:-1, 0] + u[:-2, 0]) / h**2
+    u[1:-1, 1] = (u[:, 0] + k*d_init)[1:-1] + k**2 / 2 * (u[2:, 0] - 2*u[1:-1, 0] + u[:-2, 0]) / h**2

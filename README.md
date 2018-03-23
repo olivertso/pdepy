@@ -28,7 +28,3 @@ array([[ 0.    ,  0.1875,  0.25  ,  0.1875,  0.    ],
        [ 0.1875,  0.375 ,  0.4375,  0.375 ,  0.1875],
        [ 0.    ,  0.1875,  0.25  ,  0.1875,  0.    ]])
 ```
-
- Laplace | Parabolic | Wave
-:-------:|:---------:|:----:
-![Alt text](/img/fig_laplace.png?raw=true "fig_laplace") | ![Alt text](/img/fig_parabolic.png?raw=true "fig_parabolic") | ![Alt text](/img/fig_wave.png?raw=true "fig_wave")

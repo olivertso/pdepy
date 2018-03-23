@@ -73,3 +73,7 @@ Icon?
 .gdb_history
 ehthumbs.db
 Thumbs.db
+
+# Others
+venv
+*.pyc
