@@ -1,8 +1,10 @@
 PDEPy
 -----
 
-.. image:: https://travis-ci.org/olivertso/pde.svg?branch=master
-    :target: https://travis-ci.org/olivertso/pde
+.. image:: https://travis-ci.org/olivertso/pdepy.svg?branch=master
+    :target: https://travis-ci.org/olivertso/pdepy
+
+----
 
 A python 3 library for solving initial and boundary value problems of some linear partial differential equations using finite-difference methods.
 
