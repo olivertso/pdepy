@@ -46,10 +46,9 @@ setup(
         'dev': [
             'flake8==3.5.0',
             'Fabric3==1.13.1.post1',
-            'isort==4.2.15'
-        ],
-        'test': [
-            'coverage==4.4.2'
+            'isort==4.2.15',
+            'nose2==0.7.4',
+            'nose2[coverage_plugin]'
         ],
         'travis': [
             'coveralls==1.2.0'

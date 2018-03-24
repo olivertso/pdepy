@@ -9,3 +9,8 @@ def lint():
 def test():
     lint()
     local('nose2')
+
+
+def coverage(report_type='term-missing'):
+    lint()
+    local('nose2 --with-coverage --coverage-report {}'.format(report_type))
