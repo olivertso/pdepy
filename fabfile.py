@@ -14,3 +14,10 @@ def test():
 def coverage(report_type='term-missing'):
     lint()
     local('nose2 --with-coverage --coverage-report {}'.format(report_type))
+
+
+def distribute():
+    coverage()
+    local('python setup.py sdist')
+    local('python setup.py bdist_wheel')
+    local('twine upload dist/*')
