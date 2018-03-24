@@ -11,12 +11,12 @@ Initial and boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base
-from . import time
+from . import base, time
 
 __all__ = ['solve']
 
 _METHODS = ['ec', 'eu', 'ic', 'iu']
+
 
 def solve(axis, params, conds, method='iu'):
     """
@@ -60,6 +60,7 @@ def solve(axis, params, conds, method='iu'):
 
     return u
 
+
 def _explicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
     """Métodos de diferenças finitas explícitos."""
     for j in np.arange(u.shape[1]-1):
@@ -67,6 +68,7 @@ def _explicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
                        (𝛂*p + β*(𝛉*np.abs(q) + q)) * u[2:, j] + \
                        (1 + k*r - 2*(𝛂*p + 𝛉*β*np.abs(q))) * u[1:-1, j] + \
                        k * s
+
 
 def _implicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
     """Métodos de diferenças finitas implícitos."""
@@ -81,22 +83,25 @@ def _implicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
 
         u[1:-1, j+1] = linalg.solve(mat, vec)
 
+
 def _set_mat(𝛉, 𝛂, β, k, p, q, r, n, aux):
     """Monta a matriz do sistema em cada iteração de '_implicit()'."""
-    main  = np.full(n, aux[2])
+    main = np.full(n, aux[2])
     upper = np.full(n-1, aux[0])
     lower = np.full(n-1, aux[1])
 
     return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
+
 def _set_vec(𝛉, 𝛂, β, k, p, q, s, u, aux):
     """Monta o vetor do sistema em cada iteração de '_implicit()'."""
     vec = - u[1:-1, 0] - k*s
 
-    vec[0]  -= aux[1] * u[0, 1]
+    vec[0] -= aux[1] * u[0, 1]
     vec[-1] -= aux[0] * u[-1, 1]
 
     return vec
+
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂', 'β' e 'k'."""
@@ -108,9 +113,10 @@ def _cal_constants(x, y):
 
     return (𝛂, β, k)
 
+
 def _set_𝛉(method):
     """Retorna o valor de '𝛉' conforme 'method'."""
-    if method[1] =='c':
+    if method[1] == 'c':
         return 0
     elif method[1] == 'u':
         return 1

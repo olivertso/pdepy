@@ -9,12 +9,12 @@ Boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base
-from . import steady
+from . import base, steady
 
 __all__ = ['solve']
 
 _METHODS = ['ic']
+
 
 def solve(axis, conds, method='ic'):
     """
@@ -47,6 +47,7 @@ def solve(axis, conds, method='ic'):
 
     return u
 
+
 def _implicit(u, x, y, 𝛂, β):
     """Métodos de diferenças finitas implícitos."""
     xn, yn = x.size, y.size
@@ -58,6 +59,7 @@ def _implicit(u, x, y, 𝛂, β):
 
     u[1:-1, 1:-1] = np.reshape(x, (xn-2, yn-2), 'F')
 
+
 def _set_mat(𝛂, β, xn, yn):
     """Monta a matriz do sistema em '_implicit()'."""
     n = (xn-1) * (yn-1)
@@ -68,19 +70,20 @@ def _set_mat(𝛂, β, xn, yn):
 
     sub1[xn-2:-1:xn-1] = 0
 
-    return np.diag(main) + np.diag(sub1, 1) + np.diag(sub1, -1) + \
-           np.diag(sub2, xn-1) + np.diag(sub2, -xn+1)
+    return np.diag(main) + np.diag(sub1, 1) + np.diag(sub1, -1) + np.diag(sub2, xn-1) + np.diag(sub2, -xn+1)
+
 
 def _set_vec(𝛂, β, u):
     """Monta o vetor do sistema em '_implicit()'."""
     vec = np.zeros_like((u[1:-1, 1:-1]))
 
-    vec[0, :]  -= β * u[0, 1:-1]
+    vec[0, :] -= β * u[0, 1:-1]
     vec[-1, :] -= β * u[-1, 1:-1]
-    vec[:, 0]  -= 𝛂 * u[1:-1, 0]
+    vec[:, 0] -= 𝛂 * u[1:-1, 0]
     vec[:, -1] -= 𝛂 * u[1:-1, -1]
 
     return np.reshape(vec, np.size(vec), 'F')
+
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂' e 'β'."""

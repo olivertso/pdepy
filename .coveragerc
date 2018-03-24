@@ -1,0 +1,12 @@
+[run]
+source =
+    pdepy/
+omit =
+    fabfile.py
+    setup.py
+    *__init__.py
+    */tests/*
+    */venv/*
+
+[html]
+directory = reports/coverage
