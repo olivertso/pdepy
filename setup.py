@@ -15,7 +15,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pdepy',
-    version='1.0.0',
+    version='1.0.1',
     description='A Finite-Difference PDE solver.',
     long_description=long_description,
     url='https://github.com/olivertso/pdepy',
