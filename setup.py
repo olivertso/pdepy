@@ -15,14 +15,14 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 
 setup(
     name='pdepy',
-    version='1.0.0a1',
+    version='1.0.0',
     description='A Finite-Difference PDE solver.',
     long_description=long_description,
     url='https://github.com/olivertso/pdepy',
     author='Oliver Hung Buo Tso',
     author_email='olivertsor@gmail.com',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'Intended Audience :: Developers',
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
