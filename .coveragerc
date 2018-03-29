@@ -4,7 +4,6 @@ source =
 omit =
     fabfile.py
     setup.py
-    *__init__.py
     */tests/*
     */venv/*
 

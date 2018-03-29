@@ -27,29 +27,20 @@ setup(
         'Intended Audience :: Education',
         'Intended Audience :: Science/Research',
         'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: Implementation :: CPython',
         'Topic :: Scientific/Engineering',
         'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Scientific/Engineering :: Physics'
+        'Topic :: Scientific/Engineering :: Physics',
+        'Topic :: Software Development'
     ],
     keywords='partial-differential-equations finite-difference-method',
     packages=['pdepy'],
-    python_requires='>=3',
+    python_requires='>=3.6',
     install_requires=[
-        'numpy==1.14.2',
-        'scipy==1.0.0'
-    ],
-    extras_require={
-        'dev': [
-            'flake8==3.5.0',
-            'Fabric3==1.13.1.post1',
-            'isort==4.2.15',
-            'nose2==0.7.4',
-            'nose2[coverage_plugin]'
-        ],
-        'travis': [
-            'coveralls==1.2.0'
-        ]
-    },
+        'numpy>=1.14.2',
+        'scipy>=1.0.0'
+    ]
 )

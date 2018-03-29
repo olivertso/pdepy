@@ -2,6 +2,9 @@
 PDEPy
 =====
 
+.. image:: https://img.shields.io/github/tag/olivertso/pdepy.svg
+    :target: https://github.com/olivertso/pdepy
+
 .. image:: https://travis-ci.org/olivertso/pdepy.svg?branch=master
     :target: https://travis-ci.org/olivertso/pdepy
 
@@ -116,8 +119,11 @@ Developing and Testing
 
 ::
 
-    # Install locally.
-    pip install -e .[dev]
+    # Install requirements.
+    pip install -r requirements/dev.txt
+
+    # Install the package locally.
+    pip install -e .
 
     # Lint the code.
     fab lint
@@ -138,9 +144,6 @@ Packaging and Distributing
 Do not forget to update the :code:`version` field in :code:`setup.py`.
 
 ::
-
-    # Install "twine" if not installed yet.
-    pip install twine
 
     # Package and distribute to PyPI.
     fab distribute
