@@ -1,7 +1,6 @@
 """Tests for the wave module."""
 
 import numpy as np
-
 from pdepy import wave
 
 expect_wave_e_i = [

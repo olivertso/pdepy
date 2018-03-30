@@ -1,10 +1,13 @@
 language: python
+
 python:
   - 3.6
+
 install:
-  - pip install -r requirements/dev.txt
-  - pip install .
+  - pip install tox coveralls
+
 script:
-  - fab coverage
+  - tox
+
 after_success:
   - coveralls

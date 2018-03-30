@@ -1,7 +1,6 @@
 """Tests for the parabolic module."""
 
 import numpy as np
-
 from pdepy import parabolic
 
 expect_parabolic_ec = [

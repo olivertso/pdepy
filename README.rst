@@ -2,8 +2,8 @@
 PDEPy
 =====
 
-.. image:: https://img.shields.io/github/tag/olivertso/pdepy.svg
-    :target: https://github.com/olivertso/pdepy
+.. image:: https://img.shields.io/pypi/v/pdepy.svg
+    :target: https://pypi.org/project/pdepy/
 
 .. image:: https://travis-ci.org/olivertso/pdepy.svg?branch=master
     :target: https://travis-ci.org/olivertso/pdepy
@@ -119,23 +119,14 @@ Developing and Testing
 
 ::
 
-    # Install requirements.
-    pip install -r requirements/dev.txt
-
-    # Install the package locally.
+    pip install tox
     pip install -e .
 
-    # Lint the code.
-    fab lint
+    # Testing.
+    tox
 
-    # Run unit tests without coverage.
-    fab test
-
-    # Run unit tests and print coverage reports on the screen.
-    fab coverage
-
-    # Run unit tests and create coverage reports in html files.
-    fab coverage:html
+    # Always remove .tox/ after changing the files in ./requirements.
+    rm -rf .tox/
 
 
 Packaging and Distributing
@@ -145,7 +136,13 @@ Do not forget to update the :code:`version` field in :code:`setup.py`.
 
 ::
 
-    # Package and distribute to PyPI.
-    fab distribute
+    pip install twine
 
-More `here <https://packaging.python.org/tutorials/distributing-packages/>`_.
+    # Packaging.
+    python setup.py sdist
+    python setup.py bdist_wheel
+
+    # Distributing.
+    twine upload dist/*
+
+More about packaging and distributing `here <https://packaging.python.org/tutorials/distributing-packages/>`_.

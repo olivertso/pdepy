@@ -1,7 +1,6 @@
 """Tests for the laplace module."""
 
 import numpy as np
-
 from pdepy import laplace
 
 expect_laplace_ic = [
