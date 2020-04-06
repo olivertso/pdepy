@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+python -m venv .venv
+bin/run pip install -U pip setuptools
+bin/run pip install pip-tools
+bin/install_requirements
