@@ -13,12 +13,12 @@ from scipy import linalg
 
 from . import base, time
 
-__all__ = ['solve']
+__all__ = ["solve"]
 
-_METHODS = ['ec', 'eu', 'ic', 'iu']
+_METHODS = ["ec", "eu", "ic", "iu"]
 
 
-def solve(axis, params, conds, method='iu'):
+def solve(axis, params, conds, method="iu"):
     """
     Methods
     -------
@@ -53,9 +53,9 @@ def solve(axis, params, conds, method='iu'):
 
     𝛉 = _set_𝛉(method)
 
-    if method[0] == 'e':
+    if method[0] == "e":
         _explicit(u, 𝛉, *consts, *params)
-    elif method[0] == 'i':
+    elif method[0] == "i":
         _implicit(u, 𝛉, *consts, *params)
 
     return u
@@ -63,39 +63,41 @@ def solve(axis, params, conds, method='iu'):
 
 def _explicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
     """Métodos de diferenças finitas explícitos."""
-    for j in np.arange(u.shape[1]-1):
-        u[1:-1, j+1] = (𝛂*p + β*(𝛉*np.abs(q) - q)) * u[:-2, j] + \
-                       (𝛂*p + β*(𝛉*np.abs(q) + q)) * u[2:, j] + \
-                       (1 + k*r - 2*(𝛂*p + 𝛉*β*np.abs(q))) * u[1:-1, j] + \
-                       k * s
+    for j in np.arange(u.shape[1] - 1):
+        u[1:-1, j + 1] = (
+            (𝛂 * p + β * (𝛉 * np.abs(q) - q)) * u[:-2, j]
+            + (𝛂 * p + β * (𝛉 * np.abs(q) + q)) * u[2:, j]
+            + (1 + k * r - 2 * (𝛂 * p + 𝛉 * β * np.abs(q))) * u[1:-1, j]
+            + k * s
+        )
 
 
 def _implicit(u, 𝛉, 𝛂, β, k, p, q, r, s):
     """Métodos de diferenças finitas implícitos."""
-    aux0 = 𝛂*p + β*(𝛉*np.abs(q) + q)
-    aux1 = 𝛂*p + β*(𝛉*np.abs(q) - q)
-    aux2 = - 1 + k*r - 2*(𝛂*p + 𝛉*β*np.abs(q))
+    aux0 = 𝛂 * p + β * (𝛉 * np.abs(q) + q)
+    aux1 = 𝛂 * p + β * (𝛉 * np.abs(q) - q)
+    aux2 = -1 + k * r - 2 * (𝛂 * p + 𝛉 * β * np.abs(q))
 
-    mat = _set_mat(𝛉, 𝛂, β, k, p, q, r, np.shape(u)[0]-2, (aux0, aux1, aux2))
+    mat = _set_mat(𝛉, 𝛂, β, k, p, q, r, np.shape(u)[0] - 2, (aux0, aux1, aux2))
 
-    for j in np.arange(u.shape[1]-1):
-        vec = _set_vec(𝛉, 𝛂, β, k, p, q, s, u[:, j:j+2], (aux0, aux1))
+    for j in np.arange(u.shape[1] - 1):
+        vec = _set_vec(𝛉, 𝛂, β, k, p, q, s, u[:, j : j + 2], (aux0, aux1))
 
-        u[1:-1, j+1] = linalg.solve(mat, vec)
+        u[1:-1, j + 1] = linalg.solve(mat, vec)
 
 
 def _set_mat(𝛉, 𝛂, β, k, p, q, r, n, aux):
     """Monta a matriz do sistema em cada iteração de '_implicit()'."""
     main = np.full(n, aux[2])
-    upper = np.full(n-1, aux[0])
-    lower = np.full(n-1, aux[1])
+    upper = np.full(n - 1, aux[0])
+    lower = np.full(n - 1, aux[1])
 
     return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
 
 def _set_vec(𝛉, 𝛂, β, k, p, q, s, u, aux):
     """Monta o vetor do sistema em cada iteração de '_implicit()'."""
-    vec = - u[1:-1, 0] - k*s
+    vec = -u[1:-1, 0] - k * s
 
     vec[0] -= aux[1] * u[0, 1]
     vec[-1] -= aux[0] * u[-1, 1]
@@ -105,18 +107,18 @@ def _set_vec(𝛉, 𝛂, β, k, p, q, s, u, aux):
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂', 'β' e 'k'."""
-    h = x[-1] / (x.size-1)
-    k = y[-1] / (y.size-1)
+    h = x[-1] / (x.size - 1)
+    k = y[-1] / (y.size - 1)
 
-    𝛂 = k / h**2
-    β = k / (2*h)
+    𝛂 = k / h ** 2
+    β = k / (2 * h)
 
     return (𝛂, β, k)
 
 
 def _set_𝛉(method):
     """Retorna o valor de '𝛉' conforme 'method'."""
-    if method[1] == 'c':
+    if method[1] == "c":
         return 0
-    elif method[1] == 'u':
+    elif method[1] == "u":
         return 1

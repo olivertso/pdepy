@@ -11,12 +11,12 @@ from scipy import linalg
 
 from . import base, steady
 
-__all__ = ['solve']
+__all__ = ["solve"]
 
-_METHODS = ['ic']
+_METHODS = ["ic"]
 
 
-def solve(axis, conds, method='ic'):
+def solve(axis, conds, method="ic"):
     """
     Methods
     -------
@@ -52,25 +52,31 @@ def _implicit(u, x, y, 𝛂, β):
     """Métodos de diferenças finitas implícitos."""
     xn, yn = x.size, y.size
 
-    mat = _set_mat(𝛂, β, xn-1, yn-1)
+    mat = _set_mat(𝛂, β, xn - 1, yn - 1)
     vec = _set_vec(𝛂, β, u)
 
     x = linalg.solve(mat, vec)
 
-    u[1:-1, 1:-1] = np.reshape(x, (xn-2, yn-2), 'F')
+    u[1:-1, 1:-1] = np.reshape(x, (xn - 2, yn - 2), "F")
 
 
 def _set_mat(𝛂, β, xn, yn):
     """Monta a matriz do sistema em '_implicit()'."""
-    n = (xn-1) * (yn-1)
+    n = (xn - 1) * (yn - 1)
 
-    main = np.full(n, -2*(𝛂+β))
-    sub1 = np.full(n-1, β)
-    sub2 = np.full(n-xn+1, 𝛂)
+    main = np.full(n, -2 * (𝛂 + β))
+    sub1 = np.full(n - 1, β)
+    sub2 = np.full(n - xn + 1, 𝛂)
 
-    sub1[xn-2:-1:xn-1] = 0
+    sub1[xn - 2 : -1 : xn - 1] = 0
 
-    return np.diag(main) + np.diag(sub1, 1) + np.diag(sub1, -1) + np.diag(sub2, xn-1) + np.diag(sub2, -xn+1)
+    return (
+        np.diag(main)
+        + np.diag(sub1, 1)
+        + np.diag(sub1, -1)
+        + np.diag(sub2, xn - 1)
+        + np.diag(sub2, -xn + 1)
+    )
 
 
 def _set_vec(𝛂, β, u):
@@ -82,12 +88,12 @@ def _set_vec(𝛂, β, u):
     vec[:, 0] -= 𝛂 * u[1:-1, 0]
     vec[:, -1] -= 𝛂 * u[1:-1, -1]
 
-    return np.reshape(vec, np.size(vec), 'F')
+    return np.reshape(vec, np.size(vec), "F")
 
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂' e 'β'."""
-    𝛂 = (x[-1] / (x.size-1)) ** 2
-    β = (y[-1] / (y.size-1)) ** 2
+    𝛂 = (x[-1] / (x.size - 1)) ** 2
+    β = (y[-1] / (y.size - 1)) ** 2
 
     return (𝛂, β)

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+echo "Running linters:"
+
+echo "isort..."
+bin/run isort -rc -c .
+
+echo "black..."
+bin/run black --check .
+
+echo "flake8..."
+bin/run flake8 .

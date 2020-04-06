@@ -14,12 +14,12 @@ from scipy import linalg
 
 from . import base, time
 
-__all__ = ['solve']
+__all__ = ["solve"]
 
-_METHODS = ['e', 'i']
+_METHODS = ["e", "i"]
 
 
-def solve(axis, conds, method='i'):
+def solve(axis, conds, method="i"):
     """
     Methods
     -------
@@ -49,43 +49,44 @@ def solve(axis, conds, method='i'):
 
     _set_first_row(u, *consts[1:], conds[0])
 
-    if method == 'e':
-        _explicit(u, consts[0]**(-1))
-    elif method == 'i':
-        _implicit(u, consts[0]**(-1))
+    if method == "e":
+        _explicit(u, consts[0] ** (-1))
+    elif method == "i":
+        _implicit(u, consts[0] ** (-1))
 
     return u
 
 
 def _explicit(u, 𝛂):
     """Métodos de diferenças finitas explícitos."""
-    for j in np.arange(1, u.shape[1]-1):
-        u[1:-1, j+1] = 2*u[1:-1, j] - u[1:-1, j-1] + \
-                       𝛂*(u[2:, j] - 2*u[1:-1, j] + u[:-2, j])
+    for j in np.arange(1, u.shape[1] - 1):
+        u[1:-1, j + 1] = (
+            2 * u[1:-1, j] - u[1:-1, j - 1] + 𝛂 * (u[2:, j] - 2 * u[1:-1, j] + u[:-2, j])
+        )
 
 
 def _implicit(u, 𝛂):
     """Métodos de diferenças finitas implícitos."""
-    mat = _set_mat(np.shape(u)[0]-2, 𝛂)
+    mat = _set_mat(np.shape(u)[0] - 2, 𝛂)
 
-    for j in np.arange(1, u.shape[1]-1):
-        vec = _set_vec(𝛂, u[:, j-1:j+2])
+    for j in np.arange(1, u.shape[1] - 1):
+        vec = _set_vec(𝛂, u[:, j - 1 : j + 2])
 
-        u[1:-1, j+1] = linalg.solve(mat, vec)
+        u[1:-1, j + 1] = linalg.solve(mat, vec)
 
 
 def _set_mat(n, 𝛂):
     """Monta a matriz do sistema em cada iteração de '_implicit()'."""
-    main = - 2*(np.ones(n) + 𝛂)
-    upper = np.ones(n-1)
-    lower = np.ones(n-1)
+    main = -2 * (np.ones(n) + 𝛂)
+    upper = np.ones(n - 1)
+    lower = np.ones(n - 1)
 
     return np.diag(main) + np.diag(upper, 1) + np.diag(lower, -1)
 
 
 def _set_vec(𝛂, u):
     """Monta o vetor do sistema em cada iteração de '_implicit()'."""
-    vec = - u[:-2, 0] - u[2:, 0] + 2*(1+𝛂)*u[1:-1, 0] - 4*𝛂*u[1:-1, 1]
+    vec = -u[:-2, 0] - u[2:, 0] + 2 * (1 + 𝛂) * u[1:-1, 0] - 4 * 𝛂 * u[1:-1, 1]
 
     vec[0] -= u[0, 2]
     vec[-1] -= u[-1, 2]
@@ -95,10 +96,10 @@ def _set_vec(𝛂, u):
 
 def _cal_constants(x, y):
     """Calcula as constantes '𝛂', 'h' e 'k'."""
-    h = x[-1] / (x.size-1)
-    k = y[-1] / (y.size-1)
+    h = x[-1] / (x.size - 1)
+    k = y[-1] / (y.size - 1)
 
-    𝛂 = k**2 / h**2
+    𝛂 = k ** 2 / h ** 2
 
     return (𝛂, h, k)
 
@@ -108,4 +109,6 @@ def _set_first_row(u, h, k, d_init):
     Determina a primeira linha da malha interior. 'd_init' pode ser um
     escalar ou um vetor de tamanho do 'x'.
     """
-    u[1:-1, 1] = (u[:, 0] + k*d_init)[1:-1] + k**2 / 2 * (u[2:, 0] - 2*u[1:-1, 0] + u[:-2, 0]) / h**2
+    u[1:-1, 1] = (u[:, 0] + k * d_init)[1:-1] + k ** 2 / 2 * (
+        u[2:, 0] - 2 * u[1:-1, 0] + u[:-2, 0]
+    ) / h ** 2
