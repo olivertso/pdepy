@@ -1,46 +1,43 @@
 """
 See:
+https://packaging.python.org/guides/distributing-packages-using-setuptools/
 https://packaging.python.org/en/latest/distributing.html
-https://github.com/pypa/sampleproject/blob/master/setup.py
+https://github.com/pypa/sampleproject
 """
 
-from codecs import open
 from os import path
+
 from setuptools import setup
 
-here = path.abspath(path.dirname(__file__))
 
-with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
-    long_description = f.read()
+def read(filename):
+    with open(path.join(path.dirname(__file__), filename), encoding="utf-8") as f:
+        return f.read()
+
 
 setup(
-    name='pdepy',
-    version='1.0.3',
-    description='A Finite-Difference PDE solver.',
-    long_description=long_description,
-    url='https://github.com/olivertso/pdepy',
-    author='Oliver Hung Buo Tso',
-    author_email='olivertsor@gmail.com',
+    name="pdepy",
+    version="1.0.3",
+    description="A Finite-Difference PDE solver.",
+    long_description=read("README.md"),
+    long_description_content_type="text/markdown",
+    url="https://github.com/olivertso/pdepy",
+    author="Oliver Hung Buo Tso",
+    author_email="olivertsor@gmail.com",
     classifiers=[
-        'Development Status :: 5 - Production/Stable',
-        'Intended Audience :: Developers',
-        'Intended Audience :: Education',
-        'Intended Audience :: Science/Research',
-        'License :: OSI Approved :: MIT License',
-        'Operating System :: OS Independent',
-        'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: Implementation :: CPython',
-        'Topic :: Scientific/Engineering',
-        'Topic :: Scientific/Engineering :: Mathematics',
-        'Topic :: Scientific/Engineering :: Physics',
-        'Topic :: Software Development'
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: Implementation :: CPython",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Mathematics",
+        "Topic :: Scientific/Engineering :: Physics",
     ],
-    keywords='partial-differential-equations finite-difference-method',
-    packages=['pdepy'],
-    python_requires='>=3.6',
-    install_requires=[
-        'numpy>=1.14.2',
-        'scipy>=1.0.0'
-    ]
+    keywords="partial-differential-equations finite-difference-method",
+    packages=["pdepy"],
+    install_requires=read("requirements.in").splitlines(),
+    python_requires=">=3.6",
 )

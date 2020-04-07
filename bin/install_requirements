@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+bin/run pip-compile -q requirements.in
+bin/run pip-compile -q requirements-dev.in
+bin/run pip-sync requirements.txt requirements-dev.txt
+bin/run pip install -e .

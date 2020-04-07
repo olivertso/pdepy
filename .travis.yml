@@ -1,18 +1,22 @@
+dist: xenial
+
 language: python
 
 python:
-  - 3.6
+  - 3.8
 
 install:
-  - pip install tox coveralls
+  - pip install -r requirements.txt
+  - pip install -r requirements-dev.txt
 
 script:
-  - tox
+  - bin/lint
+  - bin/test
 
 after_success:
+  - pip install coveralls
   - coveralls
 
 notifications:
   email:
     on_success: never
-    on_failure: always
