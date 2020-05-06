@@ -11,7 +11,7 @@ Initial and boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base, time
+from pdepy import base, time
 
 _METHODS = ["ec", "eu", "ic", "iu"]
 

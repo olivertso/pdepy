@@ -9,7 +9,7 @@ Boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base, steady
+from pdepy import base, steady
 
 _METHODS = ["ic"]
 
