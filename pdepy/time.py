@@ -5,8 +5,6 @@ dependente de uma variável temporal.
 
 import numpy as np
 
-__all__ = ["set_u"]
-
 
 def set_u(x, y, init, bound_x0, bound_xf):
     """Inicializa a matriz 'u' com as condições iniciais e de contorno."""

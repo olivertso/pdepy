@@ -11,8 +11,6 @@ from scipy import linalg
 
 from . import base, steady
 
-__all__ = ["solve"]
-
 _METHODS = ["ic"]
 
 

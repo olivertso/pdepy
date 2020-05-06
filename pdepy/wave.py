@@ -14,8 +14,6 @@ from scipy import linalg
 
 from . import base, time
 
-__all__ = ["solve"]
-
 _METHODS = ["e", "i"]
 
 

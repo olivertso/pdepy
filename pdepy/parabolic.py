@@ -13,8 +13,6 @@ from scipy import linalg
 
 from . import base, time
 
-__all__ = ["solve"]
-
 _METHODS = ["ec", "eu", "ic", "iu"]
 
 

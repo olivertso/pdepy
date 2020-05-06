@@ -5,8 +5,6 @@ para equações diferenciais parciais.
 
 import sys
 
-__all__ = ["check_method"]
-
 
 def check_method(method, methods):
     """Verifica se o método numérico 'method' é válido."""
