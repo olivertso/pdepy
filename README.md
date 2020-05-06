@@ -1,6 +1,6 @@
 # PDEPy
 
-[![Supported Python versions](https://img.shields.io/pypi/pyversions/pytest.svg)](https://pypi.org/project/pdepy/)
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/pdepy.svg)](https://pypi.org/project/pdepy/)
 [![PyPI version](https://badge.fury.io/py/pdepy.svg)](https://badge.fury.io/py/pdepy)
 [![Build Status](https://travis-ci.org/olivertso/pdepy.svg?branch=master)](https://travis-ci.org/olivertso/pdepy)
 [![Coverage Status](https://coveralls.io/repos/github/olivertso/pdepy/badge.svg?branch=master)](https://coveralls.io/github/olivertso/pdepy?branch=master)
