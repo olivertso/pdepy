@@ -1,6 +1,6 @@
 # PDEPy
 
-[![Supported Python versions](https://img.shields.io/pypi/pyversions/pytest.svg)](https://pypi.org/project/pdepy/)
+[![Supported Python versions](https://img.shields.io/pypi/pyversions/pdepy.svg)](https://pypi.org/project/pdepy/)
 [![PyPI version](https://badge.fury.io/py/pdepy.svg)](https://badge.fury.io/py/pdepy)
 [![Build Status](https://travis-ci.org/olivertso/pdepy.svg?branch=master)](https://travis-ci.org/olivertso/pdepy)
 [![Coverage Status](https://coveralls.io/repos/github/olivertso/pdepy/badge.svg?branch=master)](https://coveralls.io/github/olivertso/pdepy?branch=master)
@@ -46,8 +46,8 @@ bound_xf = f(xf, y)
 bound_y0 = f(x, 0)
 bound_yf = f(x, yf)
 
-axis = (x, y)
-conds = (bound_x0, bound_xf, bound_y0, bound_yf)
+axis = x, y
+conds = bound_x0, bound_xf, bound_y0, bound_yf
 
 laplace.solve(axis, conds, method="ic")
 ```
@@ -68,9 +68,9 @@ bound = 5 * np.exp(-y)
 
 p, q, r, s = 1, 1, -3, 3
 
-axis = (x, y)
-conds = (init, bound, bound)
-params = (p, q, r, s)
+axis = x, y
+conds = init, bound, bound
+params = p, q, r, s
 
 parabolic.solve(axis, params, conds, method="iu")
 ```
@@ -90,8 +90,8 @@ d_init = 1
 init = x * (1 - x)
 bound = y * (1 - y)
 
-axis = (x, y)
-conds = (d_init, init, bound, bound)
+axis = x, y
+conds = d_init, init, bound, bound
 
 wave.solve(axis, conds, method="i")
 ```

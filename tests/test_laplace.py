@@ -1,42 +1,39 @@
-"""Tests for the laplace module."""
-
 import numpy as np
+import pytest
 
 from pdepy import laplace
 
-expect_laplace_ic = [
-    [-3.0, 0.0, 1.0, 0.0, -3.0],
-    [-4.0, -1.0, -0.0, -1.0, -4.0],
-    [-3.0, -0.0, 1.0, -0.0, -3.0],
-    [0.0, 3.0, 4.0, 3.0, 0.0],
-]
 
+class TestLaplace:
+    @pytest.fixture
+    def inputs(self):
+        def initial_function(x, y):
+            return (x - 1) ** 2 - (y - 2) ** 2
 
-def test_laplace_ic():
-    axis, conds = set_inputs()
+        xn, xf, yn, yf = 3, 3.0, 4, 4.0
 
-    actual = laplace.solve(axis, conds, method="ic")
-    expect = expect_laplace_ic
+        x = np.linspace(0, xf, xn + 1)
+        y = np.linspace(0, yf, yn + 1)
 
-    assert np.allclose(actual, expect)
+        bound_x0 = initial_function(0, y)
+        bound_xf = initial_function(xf, y)
+        bound_y0 = initial_function(x, 0)
+        bound_yf = initial_function(x, yf)
 
+        axis = x, y
+        conds = bound_x0, bound_xf, bound_y0, bound_yf
 
-def set_inputs():
-    xn, xf, yn, yf = 3, 3.0, 4, 4.0
+        return axis, conds
 
-    x = np.linspace(0, xf, xn + 1)
-    y = np.linspace(0, yf, yn + 1)
+    def test_ic(self, inputs):
+        axis, conds = inputs
 
-    bound_x0 = initial_function(0, y)
-    bound_xf = initial_function(xf, y)
-    bound_y0 = initial_function(x, 0)
-    bound_yf = initial_function(x, yf)
+        actual = laplace.solve(axis, conds, method="ic")
+        expect = [
+            [-3.0, 0.0, 1.0, 0.0, -3.0],
+            [-4.0, -1.0, -0.0, -1.0, -4.0],
+            [-3.0, -0.0, 1.0, -0.0, -3.0],
+            [0.0, 3.0, 4.0, 3.0, 0.0],
+        ]
 
-    axis = (x, y)
-    conds = (bound_x0, bound_xf, bound_y0, bound_yf)
-
-    return (axis, conds)
-
-
-def initial_function(x, y):
-    return (x - 1) ** 2 - (y - 2) ** 2
+        assert np.allclose(actual, expect)
