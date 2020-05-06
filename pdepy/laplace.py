@@ -9,11 +9,10 @@ Boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from pdepy import base, steady
-
-_METHODS = ["ic"]
+from pdepy import steady, utils
 
 
+@utils.validate_method(valid_methods=["ic"])
 def solve(axis, conds, method="ic"):
     """
     Methods
@@ -36,8 +35,6 @@ def solve(axis, conds, method="ic"):
     u : ndarray
         A 2-D ndarray; u[x, y].
     """
-    base.check_method(method, _METHODS)
-
     u = steady.set_u(*axis, *conds)
     consts = _cal_constants(*axis)
 
