@@ -46,8 +46,8 @@ bound_xf = f(xf, y)
 bound_y0 = f(x, 0)
 bound_yf = f(x, yf)
 
-axis = (x, y)
-conds = (bound_x0, bound_xf, bound_y0, bound_yf)
+axis = x, y
+conds = bound_x0, bound_xf, bound_y0, bound_yf
 
 laplace.solve(axis, conds, method="ic")
 ```
@@ -68,9 +68,9 @@ bound = 5 * np.exp(-y)
 
 p, q, r, s = 1, 1, -3, 3
 
-axis = (x, y)
-conds = (init, bound, bound)
-params = (p, q, r, s)
+axis = x, y
+conds = init, bound, bound
+params = p, q, r, s
 
 parabolic.solve(axis, params, conds, method="iu")
 ```
@@ -90,8 +90,8 @@ d_init = 1
 init = x * (1 - x)
 bound = y * (1 - y)
 
-axis = (x, y)
-conds = (d_init, init, bound, bound)
+axis = x, y
+conds = d_init, init, bound, bound
 
 wave.solve(axis, conds, method="i")
 ```
