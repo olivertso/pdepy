@@ -5,8 +5,6 @@ em estados estacionários.
 
 import numpy as np
 
-__all__ = ["set_u"]
-
 
 def set_u(x, y, bound_x0, bound_xf, bound_y0, bound_yf):
     """Inicializa a matriz 'u' com as condições de contorno."""

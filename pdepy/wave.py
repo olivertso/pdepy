@@ -12,13 +12,10 @@ Initial and boundary conditions:
 import numpy as np
 from scipy import linalg
 
-from . import base, time
-
-__all__ = ["solve"]
-
-_METHODS = ["e", "i"]
+from pdepy import time, utils
 
 
+@utils.validate_method(valid_methods=["e", "i"])
 def solve(axis, conds, method="i"):
     """
     Methods
@@ -42,8 +39,6 @@ def solve(axis, conds, method="i"):
     u : ndarray
         A 2-D ndarray; u[x, y].
     """
-    base.check_method(method, _METHODS)
-
     u = time.set_u(*axis, *conds[1:])
     consts = _cal_constants(*axis)
 
