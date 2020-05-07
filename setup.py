@@ -17,7 +17,7 @@ def read(filename):
 
 setup(
     name="pdepy",
-    version="1.0.3",
+    version="1.0.4",
     description="A Finite-Difference PDE solver.",
     long_description=read("README.md"),
     long_description_content_type="text/markdown",
